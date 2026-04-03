@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Iojoy portfolio landing page with glassmorphism, video storytelling, and a modern Tailwind CSS layout.">
+    <title>Iojoy | Modern Portfolio</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=Sora:wght@600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="script.js"></script>
+
+    <style>
+        html {
+            scroll-padding-top: 7rem;
+        }
+
+        body {
+            overflow-x: clip;
+            background:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.96), transparent 24%),
+                radial-gradient(circle at top right, rgba(235, 229, 220, 0.82), transparent 30%),
+                radial-gradient(circle at bottom center, rgba(214, 206, 196, 0.24), transparent 34%),
+                linear-gradient(180deg, #f8f6f1 0%, #f2ede6 52%, #ebe4da 100%);
+        }
+
+        .hero-video-overlay {
+            background:
+                linear-gradient(180deg, rgba(17, 17, 17, 0.16) 0%, rgba(17, 17, 17, 0.38) 34%, rgba(17, 17, 17, 0.22) 66%, rgba(248, 245, 239, 0.82) 100%),
+                rgba(17, 17, 17, 0.16);
+        }
+
+        .grid-glow {
+            background-image:
+                linear-gradient(rgba(24, 24, 27, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(24, 24, 27, 0.04) 1px, transparent 1px);
+            background-size: 72px 72px;
+            mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.55), transparent 85%);
+        }
+
+        .nav-shell {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            background:
+                linear-gradient(135deg, rgba(2, 2, 2, 0.88) 0%, rgba(15, 15, 15, 0.76) 48%, rgba(34, 34, 34, 0.66) 100%);
+        }
+
+        .nav-shell::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02) 22%, rgba(255, 255, 255, 0.03) 78%, rgba(255, 255, 255, 0.08)),
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.08), transparent 20%),
+                radial-gradient(circle at 82% 50%, rgba(148, 163, 184, 0.08), transparent 22%);
+            pointer-events: none;
+        }
+
+        .nav-top-grid {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-brand {
+            min-width: 0;
+        }
+
+        .nav-time-wrap {
+            justify-self: center;
+            width: 100%;
+            max-width: 10.25rem;
+        }
+
+        .nav-time-pill {
+            position: relative;
+            width: 100%;
+            min-width: 0;
+            overflow: hidden;
+            isolation: isolate;
+            background: transparent;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        .nav-time-pill>* {
+            position: relative;
+            z-index: 3;
+        }
+
+        .nav-time-pill::before,
+        .nav-time-pill::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .nav-time-pill::before {
+            inset: -110%;
+            z-index: 0;
+            background:
+                conic-gradient(from 0deg,
+                    transparent 0deg 200deg,
+                    rgba(255, 184, 70, 0.98) 214deg,
+                    rgba(206, 255, 113, 1) 236deg,
+                    rgba(110, 212, 255, 1) 260deg,
+                    rgba(233, 120, 255, 0.98) 286deg,
+                    rgba(255, 139, 79, 0.98) 312deg,
+                    transparent 330deg 360deg);
+            filter: blur(0.5px);
+            transform-origin: 50% 50%;
+            will-change: transform;
+            animation: time-pill-spin 2.4s linear infinite;
+        }
+
+        .nav-time-pill::after {
+            inset: 1.5px;
+            z-index: 1;
+            background:
+                linear-gradient(180deg, rgba(13, 15, 21, 0.96) 0%, rgba(18, 18, 22, 0.94) 100%);
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.02);
+        }
+
+        .nav-actions {
+            justify-self: end;
+        }
+
+        @keyframes time-pill-spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .repo-screen {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            max-height: min(84vh, 62rem);
+            border-radius: 2.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background:
+                radial-gradient(circle at top left, rgba(34, 197, 94, 0.16), transparent 22%),
+                radial-gradient(circle at top right, rgba(59, 130, 246, 0.14), transparent 22%),
+                radial-gradient(circle at bottom center, rgba(236, 72, 153, 0.1), transparent 32%),
+                linear-gradient(160deg, #0d1117 0%, #11161d 36%, #161b22 100%);
+            box-shadow:
+                0 36px 90px rgba(2, 6, 23, 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .repo-screen::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent 35%),
+                linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+            background-size: auto, 32px 32px, 32px 32px;
+            opacity: 0.46;
+            pointer-events: none;
+        }
+
+        .repo-screen::after {
+            content: "";
+            position: absolute;
+            left: 22%;
+            top: -10%;
+            width: 24rem;
+            height: 24rem;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.12), transparent 65%);
+            filter: blur(36px);
+            pointer-events: none;
+        }
+
+        .repo-screen-bar {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem 1.15rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background:
+                linear-gradient(180deg, rgba(17, 22, 29, 0.96) 0%, rgba(20, 25, 33, 0.9) 100%);
+        }
+
+        .repo-screen-controls {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .repo-screen-controls span {
+            width: 0.72rem;
+            height: 0.72rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        }
+
+        .repo-screen-controls span:nth-child(1) {
+            background: #ff7b72;
+        }
+
+        .repo-screen-controls span:nth-child(2) {
+            background: #d29922;
+        }
+
+        .repo-screen-controls span:nth-child(3) {
+            background: #3fb950;
+        }
+
+        .repo-screen-handle {
+            min-width: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.68rem 1rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(248, 250, 252, 0.92);
+            backdrop-filter: blur(18px);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .repo-screen-handle span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .repo-screen-body {
+            position: relative;
+            z-index: 1;
+            flex: 1 1 auto;
+            display: grid;
+            grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+            gap: 1rem;
+            padding: 1rem;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .repo-profile-panel,
+        .repo-feed-panel {
+            min-width: 0;
+            min-height: 0;
+        }
+
+        .repo-profile-panel {
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            padding-right: 0.15rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.42) rgba(255, 255, 255, 0.03);
+        }
+
+        .repo-profile-panel::-webkit-scrollbar {
+            width: 0.5rem;
+        }
+
+        .repo-profile-panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 999px;
+        }
+
+        .repo-profile-panel::-webkit-scrollbar-thumb {
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.45);
+        }
+
+        .repo-profile-card,
+        .repo-feed-panel {
+            border-radius: 1.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(11, 16, 23, 0.74);
+            backdrop-filter: blur(24px);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                0 20px 45px rgba(2, 6, 23, 0.22);
+        }
+
+        .repo-profile-card {
+            position: relative;
+            overflow: hidden;
+            padding: 1.25rem;
+        }
+
+        .repo-profile-card>* {
+            position: relative;
+            z-index: 2;
+        }
+
+        .repo-profile-backdrop {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .repo-profile-backdrop video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 56%;
+            opacity: 0.46;
+            filter: grayscale(1) contrast(1.22) brightness(0.96);
+            mix-blend-mode: multiply;
+            transform: scale(1.16) translateY(2%);
+        }
+
+        .repo-profile-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(10, 14, 21, 0.24) 0%, rgba(10, 14, 21, 0.58) 100%),
+                linear-gradient(160deg, rgba(34, 197, 94, 0.1), transparent 24%),
+                radial-gradient(circle at 82% 12%, rgba(59, 130, 246, 0.16), transparent 22%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .repo-profile-avatar {
+            width: 5rem;
+            height: 5rem;
+            border-radius: 1.4rem;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 16px 32px rgba(2, 6, 23, 0.26);
+        }
+
+        #repoProfileName,
+        .repo-feed-head h3 {
+            color: rgb(248 250 252);
+        }
+
+        #repoProfileUsername,
+        .repo-feed-head p:first-child {
+            color: rgb(148 163 184);
+        }
+
+        #repoProfileBio,
+        #repoProfileMeta {
+            color: rgba(226, 232, 240, 0.78);
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            white-space: pre-line;
+        }
+
+        .repo-profile-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.7rem;
+            margin-top: 1rem;
+        }
+
+        .repo-profile-stat {
+            display: flex;
+            min-height: 5.5rem;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem 0.65rem;
+            border-radius: 1.1rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            text-align: center;
+        }
+
+        .repo-profile-stat strong {
+            display: block;
+            font-family: "Sora", sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: rgb(248 250 252);
+        }
+
+        .repo-profile-stat span {
+            margin-top: 0.18rem;
+            display: block;
+            font-size: 0.64rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            line-height: 1.15;
+            white-space: nowrap;
+            text-transform: uppercase;
+            color: rgb(148 163 184);
+        }
+
+        .repo-profile-note {
+            border-radius: 1.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(226, 232, 240, 0.76);
+        }
+
+        .repo-profile-note {
+            margin-top: 1rem;
+            padding: 0.9rem 1rem;
+            overflow: hidden;
+        }
+
+        #repoProfileName,
+        #repoProfileUsername {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .repo-feed-panel {
+            padding: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background:
+                linear-gradient(180deg, rgba(11, 16, 23, 0.72) 0%, rgba(13, 18, 26, 0.82) 100%);
+        }
+
+        .repo-feed-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            flex-shrink: 0;
+        }
+
+        #repoFeedMeta {
+            border-color: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgb(203 213 225);
+        }
+
+        .repo-feed-list {
+            margin-top: 1rem;
+            flex: 1 1 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+            grid-auto-rows: 1fr;
+            align-items: stretch;
+            align-content: start;
+            gap: 1rem;
+            min-height: 0;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            padding-right: 0.2rem;
+            scrollbar-gutter: stable;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.55) rgba(255, 255, 255, 0.03);
+        }
+
+        .repo-feed-list::-webkit-scrollbar {
+            width: 0.58rem;
+        }
+
+        .repo-feed-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 999px;
+        }
+
+        .repo-feed-list::-webkit-scrollbar-thumb {
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(63, 185, 80, 0.58), rgba(96, 165, 250, 0.5));
+            border: 2px solid rgba(13, 17, 23, 0.55);
+        }
+
+        .repo-row {
+            display: flex;
+            min-height: 18.5rem;
+            height: 100%;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow: hidden;
+            border-radius: 1.45rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background:
+                linear-gradient(180deg, rgba(22, 27, 34, 0.96) 0%, rgba(13, 17, 23, 0.98) 100%);
+            padding: 1rem 1.05rem;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.04),
+                0 16px 32px rgba(2, 6, 23, 0.22);
+            transition:
+                transform 0.28s ease,
+                border-color 0.28s ease,
+                box-shadow 0.28s ease,
+                background-color 0.28s ease;
+        }
+
+        .repo-row:hover {
+            transform: translateY(-4px);
+            border-color: rgba(63, 185, 80, 0.28);
+            box-shadow:
+                0 22px 42px rgba(2, 6, 23, 0.26),
+                0 0 0 1px rgba(63, 185, 80, 0.08);
+        }
+
+        .repo-row-title {
+            min-width: 0;
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .repo-row-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            min-width: 0;
+        }
+
+        .repo-row-heading {
+            font-family: "Sora", sans-serif;
+            font-size: 1.12rem;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.15;
+            color: rgb(248 250 252);
+            display: -webkit-box;
+            overflow: hidden;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+
+        .repo-row-desc {
+            margin-top: 0.75rem;
+            min-height: 5rem;
+            font-size: 0.88rem;
+            line-height: 1.8;
+            color: rgba(226, 232, 240, 0.72);
+            display: -webkit-box;
+            overflow: hidden;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+        }
+
+        .repo-row-launch {
+            display: inline-flex;
+            height: 2.5rem;
+            width: 2.5rem;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            color: rgb(148 163 184);
+            transition: color 0.28s ease, border-color 0.28s ease, background-color 0.28s ease;
+        }
+
+        .repo-row:hover .repo-row-launch {
+            color: rgb(248 250 252);
+            border-color: rgba(63, 185, 80, 0.22);
+            background: rgba(63, 185, 80, 0.08);
+        }
+
+        .repo-row-badges,
+        .repo-topic-row,
+        .repo-row-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+
+        .repo-row-badges {
+            margin-top: 0.7rem;
+        }
+
+        .repo-row-bottom {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            min-width: 0;
+        }
+
+        .repo-topic-row {
+            min-height: 2rem;
+            align-items: flex-start;
+        }
+
+        .repo-row-meta {
+            padding-top: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            gap: 0.9rem;
+            color: rgb(148 163 184);
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .repo-row-meta span {
+            min-width: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .repo-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.3rem 0.68rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: rgb(226 232 240);
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .repo-topic-chip {
+            border-radius: 999px;
+            border: 1px solid rgba(63, 185, 80, 0.14);
+            background: rgba(63, 185, 80, 0.08);
+            padding: 0.34rem 0.68rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: rgb(190 242 100);
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        #repoProfileBio,
+        #repoProfileMeta,
+        #repoFeedMeta {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .repo-lang-dot {
+            width: 0.72rem;
+            height: 0.72rem;
+            border-radius: 999px;
+            flex-shrink: 0;
+            box-shadow: 0 0 0 0.18rem rgba(255, 255, 255, 0.04);
+        }
+
+        .repo-empty-state {
+            border-radius: 1.35rem;
+            border: 1px dashed rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 1.25rem;
+            color: rgba(226, 232, 240, 0.76);
+        }
+
+        @media (max-width: 1024px) {
+            .repo-screen {
+                max-height: none;
+            }
+
+            .repo-screen-body {
+                grid-template-columns: 1fr;
+                overflow: visible;
+            }
+
+            .repo-profile-panel {
+                overflow: visible;
+                padding-right: 0;
+            }
+
+            .repo-feed-list {
+                max-height: min(68vh, 48rem);
+            }
+        }
+
+        .nav-binary-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: inherit;
+            opacity: 0.95;
+            mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+        }
+
+        .nav-binary-layer::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(2, 6, 23, 0.06), rgba(2, 6, 23, 0)),
+                repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0, rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 14px);
+        }
+
+        .nav-binary-stream {
+            position: absolute;
+            left: -4%;
+            white-space: nowrap;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.28em;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.26);
+            text-shadow: 0 0 16px rgba(255, 255, 255, 0.08);
+            will-change: transform;
+            mix-blend-mode: screen;
+            animation: binary-drift var(--duration, 20s) linear infinite;
+            animation-delay: var(--delay, 0s);
+        }
+
+        .nav-binary-stream.reverse {
+            color: rgba(148, 163, 184, 0.24);
+            animation-name: binary-drift-reverse;
+        }
+
+        @keyframes binary-drift {
+            from {
+                transform: translate3d(0, 0, 0);
+            }
+
+            to {
+                transform: translate3d(-24%, 0, 0);
+            }
+        }
+
+        @keyframes binary-drift-reverse {
+            from {
+                transform: translate3d(-18%, 0, 0);
+            }
+
+            to {
+                transform: translate3d(8%, 0, 0);
+            }
+        }
+
+        .notch-nav-wrap {
+            bottom: 0.85rem;
+            bottom: max(0.85rem, calc(env(safe-area-inset-bottom) + 0.35rem));
+        }
+
+        .notch-nav {
+            position: relative;
+            width: min(100%, 20rem);
+            --active-left: 2.75rem;
+            --bubble-size: 3.15rem;
+            --item-size: 2.7rem;
+            --notch-radius: 1.6rem;
+            --lift: 0.82rem;
+        }
+
+        .notch-nav-shadow {
+            position: absolute;
+            left: 16%;
+            right: 16%;
+            bottom: -0.45rem;
+            height: 1rem;
+            border-radius: 999px;
+            background: rgba(17, 24, 39, 0.2);
+            filter: blur(20px);
+            pointer-events: none;
+        }
+
+        .notch-nav-track {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            align-items: center;
+            gap: 0;
+            margin-top: calc(var(--bubble-size) * 0.34);
+            padding: 0.9rem 0.4rem 0.55rem;
+        }
+
+        .notch-nav-track::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            border-radius: 1.45rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background:
+                linear-gradient(180deg, rgba(19, 23, 31, 0.96) 0%, rgba(10, 14, 21, 0.98) 100%);
+            box-shadow:
+                0 24px 48px rgba(15, 23, 42, 0.18),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.02);
+            -webkit-mask: radial-gradient(circle var(--notch-radius) at var(--active-left) 0.12rem, transparent 98%, #000 100%);
+            mask: radial-gradient(circle var(--notch-radius) at var(--active-left) 0.12rem, transparent 98%, #000 100%);
+        }
+
+        .notch-nav-track::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            border-radius: 1.45rem;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 22%),
+                radial-gradient(circle at var(--active-left) 0.42rem, rgba(196, 255, 120, 0.18), transparent 2rem),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03), transparent 18%, transparent 82%, rgba(255, 255, 255, 0.04));
+            opacity: 0.92;
+            pointer-events: none;
+            -webkit-mask: radial-gradient(circle var(--notch-radius) at var(--active-left) 0.12rem, transparent 98%, #000 100%);
+            mask: radial-gradient(circle var(--notch-radius) at var(--active-left) 0.12rem, transparent 98%, #000 100%);
+        }
+
+        .notch-nav-indicator {
+            position: absolute;
+            top: 0;
+            left: var(--active-left);
+            z-index: 4;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--bubble-size);
+            height: var(--bubble-size);
+            border-radius: 999px;
+            color: #0b1215;
+            border: 1px solid rgba(120, 14, 28, 0.4);
+            background:
+                radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0) 40%),
+                radial-gradient(circle at 50% 46%, #fbf5f6 0%, #f3e1e4 32%, #d2a6ad 62%, #7a1324 82%, #4e0410 100%);
+            box-shadow:
+                0 14px 28px rgba(94, 11, 25, 0.28),
+                0 0 0 0.34rem rgba(122, 19, 36, 0.34),
+                inset 0 1px 0 rgba(255, 255, 255, 0.44),
+                inset 0 -10px 18px rgba(84, 7, 20, 0.24);
+            transform: translate(-50%, 0);
+            transition:
+                left 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.35s ease;
+            pointer-events: none;
+        }
+
+        .notch-nav-indicator::before {
+            content: "";
+            position: absolute;
+            inset: 0.45rem;
+            border-radius: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.26);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.28),
+                0 0 0 1px rgba(99, 9, 24, 0.12);
+            pointer-events: none;
+        }
+
+        .notch-nav-indicator svg,
+        .notch-nav-item svg {
+            width: 1.1rem;
+            height: 1.1rem;
+        }
+
+        .notch-nav-item {
+            position: relative;
+            z-index: 3;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--item-size);
+            height: var(--item-size);
+            margin-inline: auto;
+            border-radius: 999px;
+            color: rgba(255, 255, 255, 0.7);
+            transition:
+                transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                color 0.28s ease,
+                opacity 0.28s ease;
+        }
+
+        .notch-nav-item::before {
+            content: "";
+            position: absolute;
+            inset: 0.3rem;
+            border-radius: inherit;
+            opacity: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12), transparent 72%);
+            transition: opacity 0.28s ease;
+        }
+
+        .notch-nav-item:hover {
+            color: rgba(255, 255, 255, 0.94);
+            transform: translateY(-0.18rem);
+        }
+
+        .notch-nav-item:hover::before {
+            opacity: 1;
+        }
+
+        .notch-nav-item:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(153, 255, 95, 0.24);
+        }
+
+        .notch-nav-item.is-active {
+            transform: translateY(calc(var(--lift) * -1));
+            color: transparent;
+        }
+
+        .notch-nav-item.is-active::before,
+        .notch-nav-item.is-active svg {
+            opacity: 0;
+        }
+
+        @media (min-width: 641px) {
+            .notch-nav {
+                width: min(100%, 22rem);
+                --bubble-size: 3.35rem;
+                --item-size: 2.8rem;
+                --notch-radius: 1.72rem;
+                --lift: 0.9rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .nav-top-grid {
+                gap: 0.55rem;
+            }
+
+            .nav-time-wrap {
+                max-width: 8.4rem;
+            }
+
+            .nav-time-pill {
+                padding: 0.58rem 0.75rem;
+            }
+
+            .nav-brand span {
+                font-size: 1.05rem;
+            }
+
+            .notch-nav-track {
+                padding-inline: 0.3rem;
+                padding-top: 0.82rem;
+            }
+
+            .repo-screen {
+                border-radius: 1.85rem;
+            }
+
+            .repo-screen-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .repo-screen-handle {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .repo-screen-body {
+                overflow: visible;
+            }
+
+            .repo-profile-stat-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .repo-feed-head,
+            .repo-row-top {
+                flex-direction: column;
+            }
+
+            .nav-shell {
+                border-radius: 1.25rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .nav-time-pill::before {
+                animation-duration: 8s;
+            }
+        }
+
+        @media (max-width: 389px) {
+            .nav-top-grid {
+                grid-template-columns: auto 1fr;
+            }
+
+            .nav-time-wrap {
+                order: 3;
+                grid-column: 1 / -1;
+                max-width: 9.6rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .notch-nav {
+                width: min(100%, 18rem);
+                --bubble-size: 2.95rem;
+                --item-size: 2.45rem;
+                --notch-radius: 1.5rem;
+                --lift: 0.74rem;
+            }
+        }
+    </style>
+</head>
+
+<body id="top"
+    class="overflow-x-hidden font-body text-slate-900 antialiased selection:bg-stone-300/40 selection:text-slate-950">
+    <div class="pointer-events-none fixed inset-0 -z-30 bg-[#f6f2eb]"></div>
+    <div class="pointer-events-none fixed inset-0 -z-20 grid-glow opacity-70"></div>
+    <div
+        class="pointer-events-none fixed inset-x-0 top-24 -z-10 mx-auto h-80 w-80 rounded-full bg-white/80 blur-3xl sm:h-[28rem] sm:w-[28rem]">
+    </div>
+    <div class="pointer-events-none fixed right-0 top-1/3 -z-10 h-72 w-72 rounded-full bg-stone-300/35 blur-3xl"></div>
+
+    <!-- Navbar -->
+    <nav class="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4 lg:px-8">
+        <div class="nav-shell mx-auto max-w-7xl rounded-[24px] border border-white/15 shadow-glass backdrop-blur-2xl">
+            <div id="navbarBinaryLayer" class="nav-binary-layer" aria-hidden="true"></div>
+            <div class="nav-top-grid relative z-10 px-4 py-3 sm:px-6">
+                <a href="#top" class="nav-brand flex items-center gap-3 justify-self-start">
+                    <div class="overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-soft">
+                        <video class="h-9 w-9 object-cover sm:h-10 sm:w-10" autoplay muted loop playsinline preload="metadata">
+                            <source src="assets/video/Hlogo.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <span class="truncate font-display text-lg font-semibold tracking-tight text-white sm:text-2xl">Iojoy</span>
+                </a>
+
+                <div class="nav-time-wrap">
+                    <div
+                        class="nav-time-pill mx-auto inline-flex flex-col items-center rounded-2xl px-3 py-2 text-center backdrop-blur-md sm:min-w-[11rem]">
+                        <span id="navbarTime"
+                            class="font-techno text-[0.9rem] font-bold tracking-[0.01em] text-white sm:text-[1rem]">
+                            --:-- --
+                        </span>
+                        <span id="navbarDate"
+                            class="mt-1 font-techno text-[0.64rem] font-medium uppercase tracking-[0.24em] text-white/60 sm:text-[0.7rem]">
+                            -- --- ----
+                        </span>
+                    </div>
+                </div>
+
+                <div class="nav-actions flex items-center gap-2 sm:gap-3">
+                    <button id="openSearch" type="button" aria-label="Search"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/[0.05] text-white/90 transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.12] hover:text-white active:scale-95 sm:h-11 sm:w-11 sm:rounded-2xl">
+                        <i data-feather="search" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Panel -->
+    <div id="searchOverlay"
+        class="pointer-events-none fixed inset-0 z-[70] opacity-0 transition duration-300 ease-out">
+        <button id="searchBackdrop" type="button" aria-label="Close search"
+            class="absolute inset-0 bg-black/25 backdrop-blur-[2px]"></button>
+        <div class="relative mx-auto mt-24 max-w-3xl px-4 sm:mt-28">
+            <div class="overflow-hidden rounded-[28px] border border-black/10 bg-[rgba(255,252,247,0.92)] shadow-soft backdrop-blur-2xl">
+                <div class="flex items-center gap-3 border-b border-black/10 px-5 py-4">
+                    <i data-feather="search" class="h-4 w-4 text-slate-500"></i>
+                    <input id="siteSearchInput" type="search" placeholder="Search sections, projects, contact, repositories..."
+                        class="h-10 w-full bg-transparent font-apple text-[1rem] text-slate-900 outline-none placeholder:text-slate-400">
+                    <button id="closeSearch" type="button"
+                        class="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 transition hover:bg-black/[0.05] hover:text-slate-900">
+                        Esc
+                    </button>
+                </div>
+                <div class="border-b border-black/10 px-5 py-3">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Quick Search</p>
+                    <div id="searchMeta" class="mt-2 text-sm text-slate-500">
+                        Search anything on the page, including sections, projects, social links, and GitHub repositories.
+                    </div>
+                </div>
+                <div id="searchResults" class="max-h-[52vh] overflow-y-auto px-2 py-2">
+                    <div class="rounded-2xl px-3 py-3 text-sm text-slate-500">
+                        Start typing to search the page.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="relative pb-36 sm:pb-32">
+        <!-- Hero -->
+        <section class="relative isolate min-h-[100dvh] overflow-hidden">
+            <video class="absolute inset-0 -z-20 h-full w-full object-cover" autoplay muted loop playsinline
+                preload="metadata">
+                <source src="assets/video/m1.mp4" type="video/mp4">
+            </video>
+            <div class="hero-video-overlay absolute inset-0 -z-10"></div>
+            <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-[#f3eee6]"></div>
+
+            <div
+                class="mx-auto flex min-h-[100dvh] max-w-7xl items-center justify-center px-4 pb-20 pt-28 text-center sm:px-6 sm:pb-24 sm:pt-32 lg:px-8">
+                <div class="max-w-3xl">
+                    <span
+                        class="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-slate-200 backdrop-blur-xl shadow-glass">
+                        JAI SURYA KUMAR
+                    </span>
+                    <h1
+                        class="mt-8 font-display text-4xl font-semibold leading-tight text-white drop-shadow-[0_12px_30px_rgba(0,0,0,0.45)] sm:text-5xl lg:text-7xl">
+                        HEY, I'M JAI.
+                    </h1>
+                    <p class="mx-auto mt-6 max-w-2xl text-base leading-8 text-slate-200/90 sm:text-lg">
+                        Frontend Engineer crafting scalable UI systems and modern digital experiences.
+                    </p>
+                    <a href="#work"
+                        class="mt-10 inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-[0_18px_50px_rgba(255,255,255,0.2)] transition duration-300 hover:scale-105 hover:shadow-[0_22px_55px_rgba(255,255,255,0.24)] active:scale-95">
+                        Get Started
+                        <i data-feather="arrow-right" class="h-4 w-4"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About -->
+        <section id="about" class="relative py-20 sm:py-24 lg:py-28">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="relative overflow-hidden rounded-[36px] border border-white/30 shadow-soft">
+                    <video
+                        class="absolute inset-0 h-full w-full scale-[1.03] object-cover object-center brightness-[1.05] contrast-[1.02]"
+                        autoplay muted loop playsinline preload="metadata">
+                        <source src="assets/video/v2.mp4" type="video/mp4">
+                    </video>
+                    <div
+                        class="absolute inset-0 bg-[linear-gradient(92deg,rgba(255,255,255,0.78)_0%,rgba(255,255,255,0.34)_26%,rgba(255,255,255,0.08)_46%,rgba(255,255,255,0)_68%)]">
+                    </div>
+                    <div
+                        class="absolute inset-0 bg-[radial-gradient(circle_at_82%_20%,rgba(255,255,255,0.2),transparent_16%),radial-gradient(circle_at_88%_68%,rgba(255,255,255,0.1),transparent_18%),radial-gradient(circle_at_14%_84%,rgba(255,255,255,0.12),transparent_20%)]">
+                    </div>
+
+                    <div class="relative flex min-h-[540px] items-center p-5 sm:min-h-[640px] sm:p-8 lg:p-12">
+                        <div
+                            class="w-full max-w-xl rounded-[32px] border border-black/0 bg-transparent p-6 shadow-none backdrop-blur-0 sm:p-10">
+                            <p class="font-apple text-sm font-semibold uppercase tracking-[0.28em] text-slate-500">About
+                            </p>
+                            <h2
+                                class="mt-4 font-apple text-4xl font-semibold tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-6xl">
+                                About Me</h2>
+                            <p
+                                class="mt-5 max-w-2xl font-apple text-[1.05rem] leading-[1.85] tracking-[-0.025em] text-slate-700 sm:text-[1.12rem]">
+                                I'm a Frontend Engineer who enjoys building modern, responsive, and
+                                performance-optimized web applications. I focus on clean UI development, reusable
+                                components, and creating smooth user experiences using JavaScript, React, and Tailwind
+                                CSS. I am continuously learning and improving my skills to build better digital Stuff..!
+                            </p>
+
+                            <ul class="mt-8 grid gap-4 sm:grid-cols-2">
+                                <li
+                                    class="flex items-center gap-3 rounded-2xl border border-black/10 bg-transparent px-4 py-4 text-slate-900">
+                                    <span
+                                        class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/5 text-slate-700">
+                                        <i data-feather="code" class="h-4 w-4"></i>
+                                    </span>
+                                    <span class="font-apple text-[1.02rem] font-medium tracking-[-0.02em]">Frontend
+                                        Architecture</span>
+                                </li>
+                                <li
+                                    class="flex items-center gap-3 rounded-2xl border border-black/10 bg-transparent px-4 py-4 text-slate-900">
+                                    <span
+                                        class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/5 text-slate-700">
+                                        <i data-feather="pen-tool" class="h-4 w-4"></i>
+                                    </span>
+                                    <span class="font-apple text-[1.02rem] font-medium tracking-[-0.02em]">UI
+                                        Design</span>
+                                </li>
+                                <li
+                                    class="flex items-center gap-3 rounded-2xl border border-black/10 bg-transparent px-4 py-4 text-slate-900">
+                                    <span
+                                        class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/5 text-slate-700">
+                                        <i data-feather="layout" class="h-4 w-4"></i>
+                                    </span>
+                                    <span class="font-apple text-[1.02rem] font-medium tracking-[-0.02em]">JavaScript
+                                        Applications</span>
+                                </li>
+                                <li
+                                    class="flex items-center gap-3 rounded-2xl border border-black/10 bg-transparent px-4 py-4 text-slate-900">
+                                    <span
+                                        class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/5 text-slate-700">
+                                        <i data-feather="layers" class="h-4 w-4"></i>
+                                    </span>
+                                    <span class="font-apple text-[1.02rem] font-medium tracking-[-0.02em]">React
+                                        Ecosystem Engineering</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Work -->
+        <section id="work" class="relative py-20 sm:py-24 lg:py-28">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="mx-auto max-w-2xl text-center">
+                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-stone-500">Portfolio</p>
+                    <h2 class="mt-4 font-display text-3xl font-semibold text-slate-950 sm:text-4xl">My Work</h2>
+                    <p class="mt-5 text-base leading-8 text-slate-600">
+                        A selection of interface-driven builds focused on interaction quality, modern layout systems,
+                        and clean visual storytelling.
+                    </p>
+                </div>
+
+                <div class="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    <article
+                        class="group rounded-[30px] border border-black/10 bg-white/55 p-4 shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-2 hover:border-black/15 hover:bg-white/72">
+                        <div class="overflow-hidden rounded-[24px] border border-black/10">
+                            <video class="h-56 w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                                autoplay muted loop playsinline preload="metadata">
+                                <source src="assets/video/v1.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="px-2 pb-2 pt-5">
+                            <h3 class="font-display text-xl font-semibold text-slate-950">SaaS Dashboard Concept</h3>
+                            <p class="mt-3 text-sm leading-7 text-slate-600">
+                                A crisp dashboard concept built around modular UI, refined hierarchy, and product-minded
+                                presentation.
+                            </p>
+                            <a href="#top"
+                                class="mt-5 inline-flex items-center gap-2 rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-2.5 text-sm font-semibold text-slate-900 transition duration-300 hover:bg-black/[0.06] hover:text-black">
+                                View
+                                <i data-feather="arrow-up-right" class="h-4 w-4"></i>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article
+                        class="group rounded-[30px] border border-black/10 bg-white/55 p-4 shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-2 hover:border-black/15 hover:bg-white/72">
+                        <div class="overflow-hidden rounded-[24px] border border-black/10">
+                            <video class="h-56 w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                                autoplay muted loop playsinline preload="metadata">
+                                <source src="assets/video/abt.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="px-2 pb-2 pt-5">
+                            <h3 class="font-display text-xl font-semibold text-slate-950">Interactive Brand Page</h3>
+                            <p class="mt-3 text-sm leading-7 text-slate-600">
+                                A launch-style portfolio page that leans on motion, contrast, and modern sections to
+                                keep content engaging.
+                            </p>
+                            <a href="#about"
+                                class="mt-5 inline-flex items-center gap-2 rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-2.5 text-sm font-semibold text-slate-900 transition duration-300 hover:bg-black/[0.06] hover:text-black">
+                                View
+                                <i data-feather="arrow-up-right" class="h-4 w-4"></i>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article
+                        class="group rounded-[30px] border border-black/10 bg-white/55 p-4 shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-2 hover:border-black/15 hover:bg-white/72 md:col-span-2 xl:col-span-1">
+                        <div class="overflow-hidden rounded-[24px] border border-black/10">
+                            <video class="h-56 w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                                autoplay muted loop playsinline preload="metadata">
+                                <source src="assets/video/m1.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="px-2 pb-2 pt-5">
+                            <h3 class="font-display text-xl font-semibold text-slate-950">Video-First Showcase</h3>
+                            <p class="mt-3 text-sm leading-7 text-slate-600">
+                                A cinematic showcase card system designed to highlight web experiments, prototypes, and
+                                polished front-end work.
+                            </p>
+                            <a href="#contact"
+                                class="mt-5 inline-flex items-center gap-2 rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-2.5 text-sm font-semibold text-slate-900 transition duration-300 hover:bg-black/[0.06] hover:text-black">
+                                View
+                                <i data-feather="arrow-up-right" class="h-4 w-4"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- GitHub Repositories -->
+        <section id="repos" class="relative py-20 sm:py-24 lg:py-28">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="max-w-3xl">
+                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-stone-500">Code</p>
+                    <h2 class="mt-4 font-display text-3xl font-semibold text-slate-950 sm:text-4xl">GitHub Workspace</h2>
+                    <p class="mt-5 text-base leading-8 text-slate-600">
+                        A live GitHub-style screen that pulls your public repositories directly into the portfolio, while staying consistent with the clean glassmorphism pattern of the page.
+                    </p>
+                </div>
+
+                <div class="repo-screen mt-10">
+                    <div class="repo-screen-bar">
+                        <div class="repo-screen-controls" aria-hidden="true">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+
+                        <div class="repo-screen-handle">
+                            <i data-feather="github" class="h-4 w-4"></i>
+                            <span id="repoHandle">github.com/JAI1209</span>
+                        </div>
+
+                        <a id="githubProfileLink" href="#contact"
+                            class="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.08] px-4 py-2.5 text-sm font-semibold text-white transition duration-300 hover:bg-white/[0.14]">
+                            Open GitHub
+                            <i data-feather="arrow-up-right" class="h-4 w-4"></i>
+                        </a>
+                    </div>
+
+                    <div class="repo-screen-body">
+                        <aside class="repo-profile-panel flex flex-col gap-4">
+                            <div class="repo-profile-card">
+                                <div class="repo-profile-backdrop" aria-hidden="true">
+                                    <video autoplay muted loop playsinline preload="metadata">
+                                        <source src="assets/video/git.vid.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+
+                                <img id="repoProfileAvatar" src="https://avatars.githubusercontent.com/u/0?v=4" alt="GitHub profile avatar"
+                                    class="repo-profile-avatar">
+                                <div class="mt-5">
+                                    <p id="repoProfileName" class="font-display text-2xl font-semibold text-slate-950">GitHub Profile</p>
+                                    <p id="repoProfileUsername" class="mt-1 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">@username</p>
+                                </div>
+
+                                <p id="repoProfileBio" class="mt-5 text-sm leading-7 text-slate-600">
+                                    Loading your GitHub bio and profile summary...
+                                </p>
+
+                                <div class="repo-profile-stat-grid">
+                                    <div class="repo-profile-stat">
+                                        <strong id="repoProfileCount">0</strong>
+                                        <span>Repos</span>
+                                    </div>
+                                    <div class="repo-profile-stat">
+                                        <strong id="repoProfileStars">0</strong>
+                                        <span>Stars</span>
+                                    </div>
+                                    <div class="repo-profile-stat">
+                                        <strong id="repoProfileFollowers">0</strong>
+                                        <span>Followers</span>
+                                    </div>
+                                </div>
+
+                                <div class="repo-profile-note">
+                                    <p id="repoProfileMeta" class="text-sm leading-7 text-slate-600">
+                                        GitHub account details will appear here once the live data is loaded.
+                                    </p>
+                                </div>
+                            </div>
+                        </aside>
+
+                        <div class="repo-feed-panel">
+                            <div class="repo-feed-head">
+                                <div>
+                                    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Repositories</p>
+                                    <h3 class="mt-3 font-apple text-2xl font-semibold tracking-[-0.04em] text-slate-950">All Public Repositories</h3>
+                                </div>
+                                <p id="repoFeedMeta"
+                                    class="max-w-sm rounded-full border border-black/10 bg-black/[0.03] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    Loading repository workspace...
+                                </p>
+                            </div>
+
+                            <div id="repoGrid" class="repo-feed-list">
+                                <article class="repo-row">
+                                    <div class="h-3 w-20 rounded-full bg-white/10"></div>
+                                    <div class="mt-4 h-6 w-2/5 rounded-full bg-white/10"></div>
+                                    <div class="mt-4 h-16 rounded-[18px] bg-white/[0.06]"></div>
+                                    <div class="mt-4 flex gap-3">
+                                        <div class="h-4 w-16 rounded-full bg-white/10"></div>
+                                        <div class="h-4 w-20 rounded-full bg-white/10"></div>
+                                        <div class="h-4 w-24 rounded-full bg-white/10"></div>
+                                    </div>
+                                </article>
+                                <article class="repo-row">
+                                    <div class="h-3 w-20 rounded-full bg-white/10"></div>
+                                    <div class="mt-4 h-6 w-1/3 rounded-full bg-white/10"></div>
+                                    <div class="mt-4 h-16 rounded-[18px] bg-white/[0.06]"></div>
+                                    <div class="mt-4 flex gap-3">
+                                        <div class="h-4 w-16 rounded-full bg-white/10"></div>
+                                        <div class="h-4 w-20 rounded-full bg-white/10"></div>
+                                        <div class="h-4 w-24 rounded-full bg-white/10"></div>
+                                    </div>
+                                </article>
+                                <article class="repo-row">
+                                    <div class="h-3 w-20 rounded-full bg-white/10"></div>
+                                    <div class="mt-4 h-6 w-1/2 rounded-full bg-white/10"></div>
+                                    <div class="mt-4 h-16 rounded-[18px] bg-white/[0.06]"></div>
+                                    <div class="mt-4 flex gap-3">
+                                        <div class="h-4 w-16 rounded-full bg-white/10"></div>
+                                        <div class="h-4 w-20 rounded-full bg-white/10"></div>
+                                        <div class="h-4 w-24 rounded-full bg-white/10"></div>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="relative py-20 sm:py-24 lg:py-28">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+                    <div class="rounded-[32px] border border-black/10 bg-white/60 p-8 shadow-soft backdrop-blur-xl sm:p-10">
+                        <p class="text-sm font-semibold uppercase tracking-[0.24em] text-stone-500">Contact</p>
+                        <h2 class="mt-4 font-display text-3xl font-semibold text-slate-950 sm:text-4xl">Let's Connect</h2>
+                        <p class="mt-5 text-base leading-8 text-slate-600">
+                            Find me across social platforms, reach out on WhatsApp, or jump straight into my GitHub profile.
+                            The links below are wired from the config in the JavaScript file so they stay easy to update.
+                        </p>
+                        <div class="mt-8 rounded-[24px] border border-black/10 bg-black/[0.03] p-5">
+                            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Primary Email</p>
+                            <a id="emailLink" href="mailto:hello@iojoy.dev"
+                                class="mt-3 inline-flex flex-wrap items-center gap-2 break-all font-apple text-lg font-semibold tracking-[-0.03em] text-slate-900 transition hover:text-black">
+                                <i data-feather="mail" class="h-4 w-4"></i>
+                                rajsuriya51@gmail.com
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <a id="contactGithub" href="#"
+                            class="group rounded-[28px] border border-black/10 bg-white/70 p-5 shadow-soft backdrop-blur-xl transition duration-300 hover:-translate-y-1.5 hover:bg-white/85">
+                            <div class="flex items-start justify-between gap-4">
+                                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-black/[0.05] text-slate-800">
+                                    <i data-feather="github" class="h-5 w-5"></i>
+                                </span>
+                                <i data-feather="arrow-up-right" class="h-4 w-4 text-slate-400 transition group-hover:text-slate-900"></i>
+                            </div>
+                            <p class="mt-5 font-apple text-xl font-semibold tracking-[-0.03em] text-slate-950">GitHub</p>
+                            <p id="contactGithubText" class="mt-2 text-sm leading-7 text-slate-600">Add your GitHub username in script.js</p>
+                        </a>
+
+                        <a id="contactLinkedin" href="#"
+                            class="group rounded-[28px] border border-black/10 bg-white/70 p-5 shadow-soft backdrop-blur-xl transition duration-300 hover:-translate-y-1.5 hover:bg-white/85">
+                            <div class="flex items-start justify-between gap-4">
+                                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-black/[0.05] text-slate-800">
+                                    <i data-feather="linkedin" class="h-5 w-5"></i>
+                                </span>
+                                <i data-feather="arrow-up-right" class="h-4 w-4 text-slate-400 transition group-hover:text-slate-900"></i>
+                            </div>
+                            <p class="mt-5 font-apple text-xl font-semibold tracking-[-0.03em] text-slate-950">LinkedIn</p>
+                            <p id="contactLinkedinText" class="mt-2 text-sm leading-7 text-slate-600">Add your LinkedIn profile URL in script.js</p>
+                        </a>
+
+                        <a id="contactInstagram" href="#"
+                            class="group rounded-[28px] border border-black/10 bg-white/70 p-5 shadow-soft backdrop-blur-xl transition duration-300 hover:-translate-y-1.5 hover:bg-white/85">
+                            <div class="flex items-start justify-between gap-4">
+                                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-black/[0.05] text-slate-800">
+                                    <i data-feather="instagram" class="h-5 w-5"></i>
+                                </span>
+                                <i data-feather="arrow-up-right" class="h-4 w-4 text-slate-400 transition group-hover:text-slate-900"></i>
+                            </div>
+                            <p class="mt-5 font-apple text-xl font-semibold tracking-[-0.03em] text-slate-950">Instagram</p>
+                            <p id="contactInstagramText" class="mt-2 text-sm leading-7 text-slate-600">Add your Instagram handle in script.js</p>
+                        </a>
+
+                        <a id="contactWhatsapp" href="#"
+                            class="group rounded-[28px] border border-black/10 bg-white/70 p-5 shadow-soft backdrop-blur-xl transition duration-300 hover:-translate-y-1.5 hover:bg-white/85">
+                            <div class="flex items-start justify-between gap-4">
+                                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-black/[0.05] text-slate-800">
+                                    <i data-feather="message-circle" class="h-5 w-5"></i>
+                                </span>
+                                <i data-feather="arrow-up-right" class="h-4 w-4 text-slate-400 transition group-hover:text-slate-900"></i>
+                            </div>
+                            <p class="mt-5 font-apple text-xl font-semibold tracking-[-0.03em] text-slate-950">WhatsApp</p>
+                            <p id="contactWhatsappText" class="mt-2 text-sm leading-7 text-slate-600">Add your WhatsApp number in script.js</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="relative border-t border-black/10 py-10">
+            <div
+                class="mx-auto flex max-w-7xl flex-col gap-3 px-4 text-sm text-slate-600 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+                <p>Iojoy portfolio landing page built with HTML, Tailwind CSS, Feather icons, and local video media.</p>
+                <div class="flex flex-wrap items-center gap-3 text-slate-700">
+                    <span
+                        class="inline-flex flex-wrap items-center gap-2 break-all rounded-full border border-black/10 bg-white/55 px-4 py-2">
+                        <i data-feather="mail" class="h-4 w-4 text-slate-700"></i>
+                        rajsuriya51@gmail.com
+                    </span>
+                    <span class="text-slate-500">Modern web experiences, clean design systems.</span>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Dock -->
+    <nav class="notch-nav-wrap pointer-events-none fixed inset-x-0 z-50 flex justify-center px-4" aria-label="Quick navigation">
+        <div id="notchNav" class="notch-nav pointer-events-auto">
+            <div class="notch-nav-shadow"></div>
+            <span id="notchIndicator" class="notch-nav-indicator" aria-hidden="true">
+                <i data-feather="home"></i>
+            </span>
+            <div id="notchNavTrack" class="notch-nav-track">
+                <a href="#top" aria-label="Home" aria-current="page" class="notch-nav-item is-active">
+                    <i data-feather="home"></i>
+                </a>
+                <a href="#about" aria-label="About" class="notch-nav-item">
+                    <i data-feather="user"></i>
+                </a>
+                <a href="#work" aria-label="Work" class="notch-nav-item">
+                    <i data-feather="briefcase"></i>
+                </a>
+                <a href="#contact" aria-label="Contact" class="notch-nav-item">
+                    <i data-feather="mail"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+</body>
+
+</html>
