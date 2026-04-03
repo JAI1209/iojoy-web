@@ -45,6 +45,7 @@ const portfolioConfig = {
 window.addEventListener("DOMContentLoaded", () => {
     feather.replace({ "stroke-width": 1.8 });
 
+    const topNavbar = document.getElementById("topNavbar");
     const navbarTime = document.getElementById("navbarTime");
     const navbarDate = document.getElementById("navbarDate");
     const navbarBinaryLayer = document.getElementById("navbarBinaryLayer");
@@ -52,6 +53,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const notchNavTrack = document.getElementById("notchNavTrack");
     const notchIndicator = document.getElementById("notchIndicator");
     const notchNavItems = Array.from(document.querySelectorAll(".notch-nav-item"));
+    const smartVideos = Array.from(document.querySelectorAll("video"));
 
     const searchOverlay = document.getElementById("searchOverlay");
     const openSearchButton = document.getElementById("openSearch");
@@ -87,6 +89,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const searchState = {
         items: [],
     };
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const isConfiguredValue = (value) => {
         if (!value) {
@@ -137,6 +140,40 @@ window.addEventListener("DOMContentLoaded", () => {
             return segments.length ? segments[segments.length - 1] : parsedUrl.hostname;
         } catch (error) {
             return url;
+        }
+    };
+
+    const prefersReducedMotion = () => reducedMotionQuery.matches;
+
+    const getScrollOffset = () => {
+        const navbarHeight = topNavbar?.getBoundingClientRect().height || 0;
+        return Math.max(92, Math.round(navbarHeight + 18));
+    };
+
+    const updateLocationHash = (target) => {
+        if (!target?.id || !window.history?.replaceState) {
+            return;
+        }
+
+        window.history.replaceState(null, "", `#${target.id}`);
+    };
+
+    const scrollToTarget = (target, { updateHash = true } = {}) => {
+        if (!target) {
+            return;
+        }
+
+        const targetTop = target.id === "top"
+            ? 0
+            : Math.max(0, window.scrollY + target.getBoundingClientRect().top - getScrollOffset());
+
+        window.scrollTo({
+            top: targetTop,
+            behavior: prefersReducedMotion() ? "auto" : "smooth",
+        });
+
+        if (updateHash) {
+            updateLocationHash(target);
         }
     };
 
@@ -245,6 +282,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
         let activeItem = notchNavItems.find((item) => item.classList.contains("is-active")) || notchNavItems[0];
         let isTicking = false;
+        const sectionRatios = new Map();
+        let sectionObserver = null;
 
         const positionIndicator = (item) => {
             if (!item) {
@@ -282,13 +321,41 @@ window.addEventListener("DOMContentLoaded", () => {
             positionIndicator(item);
         };
 
-        const syncActiveItemToScroll = () => {
-            const marker = window.scrollY + (window.innerHeight * 0.42);
-            let nextItem = navEntries[0]?.item || activeItem;
+        const getEntryScore = ({ target }) => {
+            if (!target) {
+                return Number.NEGATIVE_INFINITY;
+            }
 
-            navEntries.forEach(({ item, target }) => {
-                if (target && marker >= target.offsetTop - 32) {
-                    nextItem = item;
+            const rect = target.getBoundingClientRect();
+            const ratio = sectionRatios.get(target) || 0;
+            const focusLine = getScrollOffset() + (window.innerHeight * 0.28);
+            const anchorLine = rect.top + Math.min(rect.height * 0.35, 180);
+            const distancePenalty = Math.abs(anchorLine - focusLine);
+            const isInViewport = rect.bottom > getScrollOffset() && rect.top < window.innerHeight * 0.92;
+
+            return (ratio * 1200) + (isInViewport ? 140 : 0) - distancePenalty;
+        };
+
+        const syncActiveItemToScroll = () => {
+            if (window.scrollY <= 18) {
+                setActiveItem(navEntries[0]?.item || activeItem);
+                return;
+            }
+
+            if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
+                setActiveItem(navEntries[navEntries.length - 1]?.item || activeItem);
+                return;
+            }
+
+            let nextItem = activeItem;
+            let bestScore = Number.NEGATIVE_INFINITY;
+
+            navEntries.forEach((entry) => {
+                const score = getEntryScore(entry);
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    nextItem = entry.item;
                 }
             });
 
@@ -297,6 +364,34 @@ window.addEventListener("DOMContentLoaded", () => {
             } else {
                 positionIndicator(activeItem);
             }
+        };
+
+        const observeSections = () => {
+            if (!("IntersectionObserver" in window)) {
+                return;
+            }
+
+            if (sectionObserver) {
+                sectionObserver.disconnect();
+            }
+
+            sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    sectionRatios.set(entry.target, entry.isIntersecting ? entry.intersectionRatio : 0);
+                });
+
+                requestScrollSync();
+            }, {
+                root: null,
+                rootMargin: `-${getScrollOffset()}px 0px -42% 0px`,
+                threshold: [0, 0.08, 0.16, 0.28, 0.4, 0.55, 0.72, 0.88, 1],
+            });
+
+            navEntries.forEach(({ target }) => {
+                if (target) {
+                    sectionObserver.observe(target);
+                }
+            });
         };
 
         const requestScrollSync = () => {
@@ -317,13 +412,128 @@ window.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        window.addEventListener("resize", () => positionIndicator(activeItem));
+        window.addEventListener("resize", () => {
+            positionIndicator(activeItem);
+            observeSections();
+            requestScrollSync();
+        });
         window.addEventListener("scroll", requestScrollSync, { passive: true });
         window.addEventListener("load", () => positionIndicator(activeItem));
 
+        if ("ResizeObserver" in window) {
+            const resizeObserver = new ResizeObserver(() => positionIndicator(activeItem));
+            resizeObserver.observe(notchNavTrack);
+            notchNavItems.forEach((item) => resizeObserver.observe(item));
+        }
+
+        observeSections();
         const hashMatchedItem = notchNavItems.find((item) => item.getAttribute("href") === window.location.hash);
         setActiveItem(hashMatchedItem || activeItem);
         window.requestAnimationFrame(syncActiveItemToScroll);
+    };
+
+    const initSmoothInternalNavigation = () => {
+        document.addEventListener("click", (event) => {
+            if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+                return;
+            }
+
+            const link = event.target.closest("a[href^='#']");
+
+            if (!link) {
+                return;
+            }
+
+            const href = link.getAttribute("href") || "";
+
+            if (!href || href === "#") {
+                return;
+            }
+
+            const target = document.querySelector(href);
+
+            if (!target) {
+                return;
+            }
+
+            event.preventDefault();
+            scrollToTarget(target);
+        });
+    };
+
+    const initSmartVideos = () => {
+        if (!smartVideos.length) {
+            return;
+        }
+
+        const videoState = new Map();
+
+        const syncVideoPlayback = (video) => {
+            const state = videoState.get(video);
+
+            if (!state) {
+                return;
+            }
+
+            const shouldPlay = state.shouldPlay && !document.hidden;
+
+            video.classList.toggle("smart-video", true);
+            video.classList.toggle("is-video-playing", shouldPlay);
+            video.classList.toggle("is-video-paused", !shouldPlay);
+
+            if (shouldPlay) {
+                const playPromise = video.play();
+
+                if (playPromise && typeof playPromise.catch === "function") {
+                    playPromise.catch(() => { });
+                }
+            } else {
+                video.pause();
+            }
+        };
+
+        smartVideos.forEach((video) => {
+            video.muted = true;
+            video.playsInline = true;
+            video.classList.add("smart-video", "is-video-paused");
+
+            videoState.set(video, {
+                shouldPlay: false,
+            });
+        });
+
+        if ("IntersectionObserver" in window) {
+            const videoObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    const state = videoState.get(entry.target);
+
+                    if (!state) {
+                        return;
+                    }
+
+                    state.shouldPlay = entry.isIntersecting && entry.intersectionRatio > 0.18;
+                    syncVideoPlayback(entry.target);
+                });
+            }, {
+                threshold: [0, 0.12, 0.18, 0.3, 0.5, 0.75],
+            });
+
+            smartVideos.forEach((video) => videoObserver.observe(video));
+        } else {
+            smartVideos.forEach((video) => {
+                const state = videoState.get(video);
+                state.shouldPlay = true;
+                syncVideoPlayback(video);
+            });
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            smartVideos.forEach(syncVideoPlayback);
+        });
+
+        window.addEventListener("pageshow", () => {
+            smartVideos.forEach(syncVideoPlayback);
+        });
     };
 
     const buildSearchIndex = () => {
@@ -683,7 +893,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (type === "internal" && href.startsWith("#")) {
             const target = document.querySelector(href);
             if (target) {
-                target.scrollIntoView({ behavior: "smooth", block: "start" });
+                scrollToTarget(target);
             }
             return;
         }
@@ -955,7 +1165,9 @@ window.addEventListener("DOMContentLoaded", () => {
     window.setInterval(updateNavbarDateTime, 1000);
 
     initBinaryNavbar();
+    initSmoothInternalNavigation();
     initNotchNavigation();
+    initSmartVideos();
     populateContactInfo();
     initSearch();
     loadGitHubRepos();
