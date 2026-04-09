@@ -631,6 +631,17 @@ window.addEventListener("DOMContentLoaded", () => {
 
         const videoState = new Map();
         const hydratedVideos = new WeakSet();
+        const hydrationQueue = [];
+        const queuedVideos = new WeakSet();
+        const activeHydrations = new Set();
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const isConstrainedNetwork = Boolean(connection?.saveData)
+            || ["slow-2g", "2g"].includes(String(connection?.effectiveType || "").toLowerCase());
+        let maxConcurrentHydrations = prefersReducedMotion() ? 1 : 2;
+
+        if (isConstrainedNetwork) {
+            maxConcurrentHydrations = 1;
+        }
 
         const hydrateVideoSource = (video) => {
             if (hydratedVideos.has(video)) {
@@ -657,6 +668,101 @@ window.addEventListener("DOMContentLoaded", () => {
             hydratedVideos.add(video);
         };
 
+        const queueHydration = (video, { priority = false } = {}) => {
+            if (!video || hydratedVideos.has(video) || activeHydrations.has(video) || queuedVideos.has(video)) {
+                return;
+            }
+
+            if (priority) {
+                hydrationQueue.unshift(video);
+            } else {
+                hydrationQueue.push(video);
+            }
+
+            queuedVideos.add(video);
+            drainHydrationQueue();
+        };
+
+        const scheduleRetry = (video) => {
+            const state = videoState.get(video);
+
+            if (!state || state.retryCount >= 2 || state.retryTimerId !== null) {
+                return;
+            }
+
+            state.retryCount += 1;
+            state.retryTimerId = window.setTimeout(() => {
+                state.retryTimerId = null;
+
+                if (!document.body.contains(video)) {
+                    return;
+                }
+
+                if (video.dataset.lazyVideo === "true") {
+                    video.preload = "metadata";
+                }
+
+                video.load();
+                queueHydration(video, { priority: true });
+                syncVideoPlayback(video);
+            }, 450 + (state.retryCount * 520));
+        };
+
+        const drainHydrationQueue = () => {
+            while (activeHydrations.size < maxConcurrentHydrations && hydrationQueue.length) {
+                const video = hydrationQueue.shift();
+                queuedVideos.delete(video);
+
+                if (!video || activeHydrations.has(video)) {
+                    continue;
+                }
+
+                activeHydrations.add(video);
+                hydrateVideoSource(video);
+
+                const state = videoState.get(video);
+
+                const releaseHydrationSlot = () => {
+                    if (!activeHydrations.delete(video)) {
+                        return;
+                    }
+
+                    if (state?.hydrateTimeoutId !== null) {
+                        window.clearTimeout(state.hydrateTimeoutId);
+                        state.hydrateTimeoutId = null;
+                    }
+
+                    drainHydrationQueue();
+                };
+
+                if (!state || video.readyState >= 2) {
+                    releaseHydrationSlot();
+                    syncVideoPlayback(video);
+                    continue;
+                }
+
+                const onReady = () => {
+                    state.retryCount = 0;
+                    releaseHydrationSlot();
+                    syncVideoPlayback(video);
+                };
+
+                const onStallOrError = () => {
+                    releaseHydrationSlot();
+                    scheduleRetry(video);
+                };
+
+                video.addEventListener("loadeddata", onReady, { once: true });
+                video.addEventListener("canplay", onReady, { once: true });
+                video.addEventListener("stalled", onStallOrError, { once: true });
+                video.addEventListener("error", onStallOrError, { once: true });
+
+                state.hydrateTimeoutId = window.setTimeout(() => {
+                    releaseHydrationSlot();
+                }, 2600);
+            }
+        };
+
         const syncVideoPlayback = (video) => {
             const state = videoState.get(video);
 
@@ -665,17 +771,24 @@ window.addEventListener("DOMContentLoaded", () => {
             }
 
             const shouldPlay = state.shouldPlay && !document.hidden;
+            const isReadyToPlay = video.readyState >= 2;
+            const canPlayNow = shouldPlay && isReadyToPlay;
 
             video.classList.toggle("smart-video", true);
-            video.classList.toggle("is-video-playing", shouldPlay);
-            video.classList.toggle("is-video-paused", !shouldPlay);
+            video.classList.toggle("is-video-playing", canPlayNow);
+            video.classList.toggle("is-video-paused", !canPlayNow);
 
             if (shouldPlay) {
-                hydrateVideoSource(video);
+                queueHydration(video, { priority: true });
+
+                if (!isReadyToPlay) {
+                    return;
+                }
+
                 const playPromise = video.play();
 
                 if (playPromise && typeof playPromise.catch === "function") {
-                    playPromise.catch(() => { });
+                    playPromise.catch(() => scheduleRetry(video));
                 }
             } else {
                 video.pause();
@@ -685,52 +798,62 @@ window.addEventListener("DOMContentLoaded", () => {
         smartVideos.forEach((video) => {
             video.muted = true;
             video.playsInline = true;
+            video.defaultMuted = true;
             video.classList.add("smart-video", "is-video-paused");
             if (video.dataset.lazyVideo === "true") {
-                video.preload = "none";
+                video.preload = "metadata";
             }
 
             videoState.set(video, {
                 shouldPlay: false,
+                retryCount: 0,
+                retryTimerId: null,
+                hydrateTimeoutId: null,
             });
+
+            video.addEventListener("loadeddata", () => syncVideoPlayback(video), { passive: true });
+            video.addEventListener("canplay", () => syncVideoPlayback(video), { passive: true });
+            video.addEventListener("stalled", () => scheduleRetry(video), { passive: true });
+            video.addEventListener("error", () => scheduleRetry(video), { passive: true });
         });
 
         smartVideos.forEach((video) => {
             if (video.dataset.priorityVideo === "true") {
-                hydrateVideoSource(video);
-                if (video.dataset.lazyVideo === "true") {
-                    video.preload = "metadata";
-                }
+                queueHydration(video, { priority: true });
             }
         });
 
         if ("IntersectionObserver" in window) {
             const videoObserver = new IntersectionObserver((entries) => {
                 entries.forEach((entry) => {
-                    const state = videoState.get(entry.target);
+                    const video = entry.target;
+                    const state = videoState.get(video);
 
                     if (!state) {
                         return;
                     }
 
-                    if (entry.isIntersecting) {
-                        hydrateVideoSource(entry.target);
+                    const isNearViewport = entry.isIntersecting
+                        || entry.boundingClientRect.top < (window.innerHeight * 1.4);
+
+                    if (isNearViewport) {
+                        queueHydration(video, { priority: entry.isIntersecting });
                     }
 
-                    state.shouldPlay = entry.isIntersecting && entry.intersectionRatio > 0.18;
-                    syncVideoPlayback(entry.target);
+                    state.shouldPlay = entry.isIntersecting && entry.intersectionRatio > 0.04;
+                    syncVideoPlayback(video);
                 });
             }, {
-                rootMargin: "220px 0px",
-                threshold: [0, 0.12, 0.18, 0.3, 0.5, 0.75],
+                rootMargin: "560px 0px",
+                threshold: [0, 0.04, 0.1, 0.24, 0.5, 0.75],
             });
 
             smartVideos.forEach((video) => videoObserver.observe(video));
         } else {
             smartVideos.forEach((video) => {
                 const state = videoState.get(video);
-                hydrateVideoSource(video);
                 state.shouldPlay = true;
+                queueHydration(video, { priority: true });
                 syncVideoPlayback(video);
             });
         }
@@ -741,6 +864,26 @@ window.addEventListener("DOMContentLoaded", () => {
 
         window.addEventListener("pageshow", () => {
             smartVideos.forEach(syncVideoPlayback);
+        });
+
+        window.addEventListener("pagehide", () => {
+            smartVideos.forEach((video) => {
+                const state = videoState.get(video);
+
+                if (!state) {
+                    return;
+                }
+
+                if (state.retryTimerId !== null) {
+                    window.clearTimeout(state.retryTimerId);
+                    state.retryTimerId = null;
+                }
+
+                if (state.hydrateTimeoutId !== null) {
+                    window.clearTimeout(state.hydrateTimeoutId);
+                    state.hydrateTimeoutId = null;
+                }
+            });
         });
     };
 
