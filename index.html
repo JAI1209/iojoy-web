@@ -4,19 +4,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    <meta name="theme-color" content="#f3eee6">
     <meta name="description"
         content="Iojoy portfolio landing page with glassmorphism, video storytelling, and a modern Tailwind CSS layout.">
     <title>Iojoy | Modern Portfolio</title>
 
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="//unpkg.com">
+    <link rel="dns-prefetch" href="//api.github.com">
+    <link rel="dns-prefetch" href="//avatars.githubusercontent.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="preconnect" href="https://api.github.com" crossorigin>
+    <link rel="preconnect" href="https://avatars.githubusercontent.com" crossorigin>
+    <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=Sora:wght@600;700;800&display=swap">
+    <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=Sora:wght@600;700;800&display=swap"
-        rel="stylesheet">
+        media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=Sora:wght@600;700;800&display=swap">
+    </noscript>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="script.js"></script>
+    <script src="https://unpkg.com/feather-icons" defer></script>
+    <script src="script.js" defer></script>
 
     <style>
         @property --active-left {
@@ -38,6 +56,249 @@
                 radial-gradient(circle at top right, rgba(235, 229, 220, 0.82), transparent 30%),
                 radial-gradient(circle at bottom center, rgba(214, 206, 196, 0.24), transparent 34%),
                 linear-gradient(180deg, #f8f6f1 0%, #f2ede6 52%, #ebe4da 100%);
+        }
+
+        main>section:not(:first-of-type) {
+            content-visibility: auto;
+            contain-intrinsic-size: 960px;
+        }
+
+        .site-ambient-wash {
+            position: fixed;
+            inset: -18%;
+            overflow: hidden;
+            opacity: 0.94;
+            filter: saturate(1.12);
+        }
+
+        .site-ambient-ribbons {
+            position: fixed;
+            inset: -20%;
+            overflow: hidden;
+            opacity: 0.84;
+            filter: saturate(1.08);
+        }
+
+        .site-ambient-wash::before,
+        .site-ambient-wash::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            will-change: transform, opacity;
+        }
+
+        .site-ambient-ribbons::before,
+        .site-ambient-ribbons::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            will-change: transform, opacity;
+            pointer-events: none;
+        }
+
+        .site-ambient-wash::before {
+            background:
+                radial-gradient(circle at 16% 16%, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0) 18%),
+                radial-gradient(circle at 78% 18%, rgba(232, 223, 207, 0.54) 0%, rgba(232, 223, 207, 0) 22%),
+                radial-gradient(circle at 50% 84%, rgba(194, 204, 214, 0.2) 0%, rgba(194, 204, 214, 0) 22%),
+                radial-gradient(circle at 34% 44%, rgba(255, 243, 224, 0.42) 0%, rgba(255, 243, 224, 0) 18%);
+            filter: blur(10px);
+            animation: ambient-drift 24s ease-in-out infinite alternate;
+        }
+
+        .site-ambient-wash::after {
+            inset: 6% 10%;
+            background:
+                conic-gradient(from 210deg at 50% 50%,
+                    rgba(255, 255, 255, 0) 0deg,
+                    rgba(255, 255, 255, 0.5) 58deg,
+                    rgba(233, 226, 214, 0.24) 118deg,
+                    rgba(255, 255, 255, 0) 210deg,
+                    rgba(191, 204, 219, 0.14) 312deg,
+                    rgba(255, 255, 255, 0) 360deg);
+            filter: blur(48px);
+            opacity: 0.62;
+            animation: ambient-rotate 30s linear infinite;
+        }
+
+        .site-ambient-ribbons::before {
+            inset: -6% -18%;
+            background:
+                linear-gradient(118deg,
+                    rgba(255, 255, 255, 0) 10%,
+                    rgba(205, 190, 171, 0.22) 22%,
+                    rgba(244, 235, 222, 0.28) 29%,
+                    rgba(255, 255, 255, 0) 39%,
+                    rgba(255, 255, 255, 0) 56%,
+                    rgba(175, 189, 203, 0.16) 66%,
+                    rgba(255, 255, 255, 0) 76%),
+                linear-gradient(132deg,
+                    rgba(255, 255, 255, 0) 18%,
+                    rgba(229, 216, 199, 0.18) 30%,
+                    rgba(255, 255, 255, 0) 44%,
+                    rgba(196, 184, 168, 0.12) 57%,
+                    rgba(255, 255, 255, 0) 72%);
+            filter: blur(28px);
+            opacity: 0.64;
+            mix-blend-mode: multiply;
+            transform: translate3d(-2%, -2%, 0) rotate(-5deg) scale(1.04);
+            animation: ribbon-sweep 36s cubic-bezier(0.37, 0, 0.2, 1) infinite alternate;
+        }
+
+        .site-ambient-ribbons::after {
+            inset: -8% -14%;
+            background:
+                radial-gradient(42% 28% at 18% 22%, rgba(255, 252, 246, 0.7), rgba(255, 255, 255, 0) 68%),
+                radial-gradient(34% 24% at 84% 18%, rgba(223, 209, 190, 0.24), rgba(232, 222, 208, 0) 72%),
+                radial-gradient(28% 22% at 54% 76%, rgba(186, 201, 214, 0.14), rgba(203, 216, 228, 0) 72%),
+                linear-gradient(126deg,
+                    rgba(255, 255, 255, 0) 14%,
+                    rgba(255, 248, 240, 0.26) 30%,
+                    rgba(255, 255, 255, 0.05) 38%,
+                    rgba(255, 255, 255, 0) 50%);
+            filter: blur(52px);
+            opacity: 0.48;
+            mix-blend-mode: screen;
+            transform: translate3d(1%, 2%, 0) scale(1.02);
+            animation: ribbon-breathe 40s ease-in-out infinite;
+        }
+
+        .site-grid-glow {
+            opacity: 0.44;
+            animation: grid-drift 34s linear infinite;
+        }
+
+        .site-light-beam {
+            transform-origin: 50% 50%;
+            background:
+                radial-gradient(ellipse at center, rgba(255, 251, 244, 0.56) 0%, rgba(255, 255, 255, 0) 62%),
+                linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(230, 218, 202, 0.26) 48%, rgba(255, 255, 255, 0) 100%);
+            filter: blur(52px);
+            opacity: 0.6;
+            mix-blend-mode: screen;
+            will-change: transform, opacity;
+            animation: light-beam-sweep 30s ease-in-out infinite alternate;
+        }
+
+        .ambient-orb {
+            will-change: transform, opacity;
+        }
+
+        .ambient-orb-primary {
+            animation: orb-float-primary 20s cubic-bezier(0.37, 0, 0.2, 1) infinite alternate;
+        }
+
+        .ambient-orb-secondary {
+            animation: orb-float-secondary 24s cubic-bezier(0.37, 0, 0.2, 1) infinite alternate;
+        }
+
+        @keyframes ambient-drift {
+            0% {
+                transform: translate3d(-2%, -1%, 0) scale(1);
+                opacity: 0.9;
+            }
+
+            50% {
+                transform: translate3d(1.5%, 2%, 0) scale(1.05);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate3d(3%, -2%, 0) scale(1.1);
+                opacity: 0.92;
+            }
+        }
+
+        @keyframes ambient-rotate {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+
+            100% {
+                transform: rotate(360deg) scale(1.08);
+            }
+        }
+
+        @keyframes grid-drift {
+            0% {
+                transform: translate3d(0, 0, 0);
+                background-position: 0 0, 0 0;
+            }
+
+            100% {
+                transform: translate3d(-1.5%, 1.2%, 0);
+                background-position: 36px 18px, 18px 36px;
+            }
+        }
+
+        @keyframes light-beam-sweep {
+            0% {
+                transform: translate3d(-4%, -2%, 0) scale(0.98);
+                opacity: 0.56;
+            }
+
+            100% {
+                transform: translate3d(5%, 4%, 0) scale(1.08);
+                opacity: 0.82;
+            }
+        }
+
+        @keyframes orb-float-primary {
+            0% {
+                transform: translate3d(-2%, 0, 0) scale(0.96);
+                opacity: 0.66;
+            }
+
+            100% {
+                transform: translate3d(4%, 6%, 0) scale(1.08);
+                opacity: 0.86;
+            }
+        }
+
+        @keyframes orb-float-secondary {
+            0% {
+                transform: translate3d(3%, -1%, 0) scale(1);
+                opacity: 0.3;
+            }
+
+            100% {
+                transform: translate3d(-5%, 5%, 0) scale(1.12);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes ribbon-sweep {
+            0% {
+                transform: translate3d(-3%, -2%, 0) rotate(-5deg) scale(1.02);
+                opacity: 0.44;
+            }
+
+            50% {
+                transform: translate3d(0, 1%, 0) rotate(-3deg) scale(1.06);
+                opacity: 0.68;
+            }
+
+            100% {
+                transform: translate3d(3%, 3%, 0) rotate(-1deg) scale(1.08);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes ribbon-breathe {
+            0% {
+                transform: translate3d(2%, -2%, 0) scale(1);
+                opacity: 0.34;
+            }
+
+            50% {
+                transform: translate3d(0, 1%, 0) scale(1.05);
+                opacity: 0.56;
+            }
+
+            100% {
+                transform: translate3d(-3%, 3%, 0) scale(1.08);
+                opacity: 0.4;
+            }
         }
 
         .smart-video {
@@ -92,29 +353,37 @@
 
         .nav-top-grid {
             display: grid;
-            grid-template-columns: auto minmax(0, 1fr) auto;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
             align-items: center;
             gap: 0.75rem;
         }
 
         .nav-brand {
             min-width: 0;
+            justify-self: start;
         }
 
         .nav-time-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             justify-self: center;
             width: 100%;
-            max-width: 10.25rem;
+            max-width: 11rem;
         }
 
         .nav-time-pill {
             position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             width: 100%;
             min-width: 0;
             overflow: hidden;
             isolation: isolate;
             background: transparent;
             box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+            font-variant-numeric: tabular-nums;
         }
 
         .nav-time-pill>* {
@@ -162,6 +431,77 @@
 
         .nav-actions {
             justify-self: end;
+            min-width: max-content;
+        }
+
+        .about-eyebrow {
+            letter-spacing: 0.34em;
+        }
+
+        .about-title {
+            color: #020617;
+            line-height: 0.94;
+            letter-spacing: -0.08em;
+            text-wrap: balance;
+            text-shadow: 0 10px 30px rgba(255, 255, 255, 0.16);
+        }
+
+        @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+            .about-title {
+                background: linear-gradient(135deg, #020617 0%, #0f172a 46%, #475569 100%);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                color: transparent;
+            }
+        }
+
+        .about-copy {
+            max-width: 33rem;
+            line-height: 1.92;
+            letter-spacing: -0.03em;
+            text-wrap: pretty;
+            color: rgba(51, 65, 85, 0.96);
+        }
+
+        .about-emphasis {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .about-highlight {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.42rem;
+            margin-top: 0.85rem;
+            padding: 0.28rem 0.78rem 0.32rem;
+            border-radius: 999px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            background: rgba(255, 255, 255, 0.48);
+            box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(12px);
+            font-size: 0.78rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: rgba(15, 23, 42, 0.72);
+        }
+
+        .about-highlight::before {
+            content: "";
+            width: 0.45rem;
+            height: 0.45rem;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(122, 19, 36, 0.96), rgba(240, 188, 198, 0.92));
+            box-shadow: 0 0 0 0.18rem rgba(122, 19, 36, 0.08);
+            flex: 0 0 auto;
+        }
+
+        .about-card-label {
+            line-height: 1.32;
+            letter-spacing: -0.04em;
+            text-wrap: balance;
         }
 
         @keyframes time-pill-spin {
@@ -574,6 +914,7 @@
             word-break: break-word;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
         }
 
         .repo-row-desc {
@@ -588,6 +929,7 @@
             word-break: break-word;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 3;
+            line-clamp: 3;
         }
 
         .repo-row-launch {
@@ -793,24 +1135,28 @@
 
         .notch-nav {
             position: relative;
-            width: min(100%, 20rem);
+            width: min(100%, 21.5rem);
             --active-left: 2.75rem;
-            --bubble-size: 3.15rem;
+            --bubble-size: 3.3rem;
             --item-size: 2.7rem;
-            --notch-radius: 1.6rem;
-            --lift: 0.82rem;
-            transition: --active-left 0.46s cubic-bezier(0.22, 1, 0.36, 1);
+            --dock-padding: 0.46rem;
+            --notch-radius: calc(var(--bubble-size) * 0.54);
+            --lift: 0.94rem;
+            contain: layout paint;
+            transition: --active-left 0.52s cubic-bezier(0.16, 1, 0.3, 1);
+            filter: drop-shadow(0 28px 42px rgba(15, 23, 42, 0.14));
         }
 
         .notch-nav-shadow {
             position: absolute;
-            left: 16%;
-            right: 16%;
-            bottom: -0.45rem;
-            height: 1rem;
+            left: 14%;
+            right: 14%;
+            bottom: -0.65rem;
+            height: 1.4rem;
             border-radius: 999px;
-            background: rgba(17, 24, 39, 0.2);
-            filter: blur(20px);
+            background: rgba(15, 23, 42, 0.22);
+            filter: blur(22px);
+            opacity: 0.82;
             pointer-events: none;
         }
 
@@ -820,9 +1166,13 @@
             grid-template-columns: repeat(4, minmax(0, 1fr));
             align-items: center;
             gap: 0;
-            margin-top: calc(var(--bubble-size) * 0.34);
-            padding: 0.9rem 0.4rem 0.55rem;
-            transition: --active-left 0.46s cubic-bezier(0.22, 1, 0.36, 1);
+            margin-top: calc(var(--bubble-size) * 0.42);
+            padding: 1rem var(--dock-padding) 0.62rem;
+            transition: --active-left 0.52s cubic-bezier(0.16, 1, 0.3, 1);
+            backface-visibility: hidden;
+            isolation: isolate;
+            overflow: visible;
+            backdrop-filter: blur(18px);
         }
 
         .notch-nav-track::before {
@@ -830,16 +1180,16 @@
             position: absolute;
             inset: 0;
             z-index: 0;
-            border-radius: 1.45rem;
+            border-radius: 1.55rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
             background:
-                linear-gradient(180deg, rgba(19, 23, 31, 0.96) 0%, rgba(10, 14, 21, 0.98) 100%);
+                linear-gradient(180deg, rgba(20, 25, 33, 0.94) 0%, rgba(8, 12, 18, 0.98) 100%);
             box-shadow:
-                0 24px 48px rgba(15, 23, 42, 0.18),
-                inset 0 1px 0 rgba(255, 255, 255, 0.06),
+                0 24px 44px rgba(15, 23, 42, 0.18),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
                 inset 0 -1px 0 rgba(255, 255, 255, 0.02);
-            -webkit-mask: radial-gradient(circle var(--notch-radius) at var(--active-left) 0.12rem, transparent 98%, #000 100%);
-            mask: radial-gradient(circle var(--notch-radius) at var(--active-left) 0.12rem, transparent 98%, #000 100%);
+            -webkit-mask: radial-gradient(circle var(--notch-radius) at var(--active-left) 0.18rem, transparent 98%, #000 100%);
+            mask: radial-gradient(circle var(--notch-radius) at var(--active-left) 0.18rem, transparent 98%, #000 100%);
         }
 
         .notch-nav-track::after {
@@ -847,63 +1197,78 @@
             position: absolute;
             inset: 0;
             z-index: 1;
-            border-radius: 1.45rem;
+            border-radius: 1.55rem;
             background:
-                linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 22%),
-                radial-gradient(circle at var(--active-left) 0.42rem, rgba(196, 255, 120, 0.18), transparent 2rem),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03), transparent 18%, transparent 82%, rgba(255, 255, 255, 0.04));
-            opacity: 0.92;
+                linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 20%),
+                radial-gradient(circle at var(--active-left) 0.58rem, rgba(255, 241, 221, 0.16), transparent 2.4rem),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.04), transparent 18%, transparent 82%, rgba(255, 255, 255, 0.04));
+            opacity: 0.94;
             pointer-events: none;
-            -webkit-mask: radial-gradient(circle var(--notch-radius) at var(--active-left) 0.12rem, transparent 98%, #000 100%);
-            mask: radial-gradient(circle var(--notch-radius) at var(--active-left) 0.12rem, transparent 98%, #000 100%);
+            -webkit-mask: radial-gradient(circle var(--notch-radius) at var(--active-left) 0.18rem, transparent 98%, #000 100%);
+            mask: radial-gradient(circle var(--notch-radius) at var(--active-left) 0.18rem, transparent 98%, #000 100%);
         }
 
         .notch-nav-indicator {
             position: absolute;
-            top: 0;
-            left: var(--active-left);
+            top: 0.02rem;
+            left: 0;
             z-index: 4;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             width: var(--bubble-size);
             height: var(--bubble-size);
-            border-radius: 999px;
-            color: #0b1215;
-            border: 1px solid rgba(120, 14, 28, 0.4);
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            color: #111827;
+            border: 1px solid rgba(239, 232, 223, 0.92);
             background:
-                radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0) 40%),
-                radial-gradient(circle at 50% 46%, #fbf5f6 0%, #f3e1e4 32%, #d2a6ad 62%, #7a1324 82%, #4e0410 100%);
+                radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0) 38%),
+                linear-gradient(180deg, #fffdf9 0%, #f4ece2 54%, #e4d8c6 100%);
             box-shadow:
-                0 14px 28px rgba(94, 11, 25, 0.28),
-                0 0 0 0.34rem rgba(122, 19, 36, 0.34),
-                inset 0 1px 0 rgba(255, 255, 255, 0.44),
-                inset 0 -10px 18px rgba(84, 7, 20, 0.24);
-            transform: translate(-50%, 0);
+                0 16px 30px rgba(15, 23, 42, 0.16),
+                0 8px 18px rgba(160, 126, 95, 0.18),
+                0 0 0 0.36rem rgba(255, 250, 244, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.94),
+                inset 0 -10px 18px rgba(148, 133, 120, 0.12);
+            transform: translate3d(calc(var(--active-left) - (var(--bubble-size) * 0.5)), 0, 0);
             transition:
-                left 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-                transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-                box-shadow 0.35s ease;
-            will-change: left, transform;
+                transform 0.54s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.35s ease,
+                filter 0.35s ease;
+            will-change: transform;
+            backface-visibility: hidden;
             pointer-events: none;
+            filter: saturate(1.04);
         }
 
         .notch-nav-indicator::before {
             content: "";
             position: absolute;
-            inset: 0.45rem;
-            border-radius: inherit;
-            border: 1px solid rgba(255, 255, 255, 0.26);
+            inset: 0.36rem;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0));
             box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.28),
-                0 0 0 1px rgba(99, 9, 24, 0.12);
+                inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                0 0 0 1px rgba(148, 163, 184, 0.08);
+            pointer-events: none;
+        }
+
+        .notch-nav-indicator::after {
+            content: "";
+            position: absolute;
+            inset: -0.42rem;
+            z-index: -1;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(214, 194, 171, 0.18), rgba(214, 194, 171, 0) 70%);
             pointer-events: none;
         }
 
         .notch-nav-indicator svg,
         .notch-nav-item svg {
-            width: 1.1rem;
-            height: 1.1rem;
+            width: 1.04rem;
+            height: 1.04rem;
         }
 
         .notch-nav-item {
@@ -916,17 +1281,19 @@
             height: var(--item-size);
             margin-inline: auto;
             border-radius: 999px;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(241, 245, 249, 0.72);
             transition:
-                transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-                color 0.28s ease,
-                opacity 0.28s ease;
+                transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                color 0.24s ease,
+                opacity 0.24s ease,
+                filter 0.24s ease;
+            will-change: transform, opacity;
         }
 
         .notch-nav-item::before {
             content: "";
             position: absolute;
-            inset: 0.3rem;
+            inset: 0.24rem;
             border-radius: inherit;
             opacity: 0;
             background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12), transparent 72%);
@@ -934,8 +1301,8 @@
         }
 
         .notch-nav-item:hover {
-            color: rgba(255, 255, 255, 0.94);
-            transform: translateY(-0.18rem);
+            color: rgba(255, 255, 255, 0.96);
+            transform: translateY(-0.1rem) scale(1.03);
         }
 
         .notch-nav-item:hover::before {
@@ -948,7 +1315,8 @@
         }
 
         .notch-nav-item.is-active {
-            transform: translateY(calc(var(--lift) * -1));
+            transform: translateY(calc(var(--lift) * -1)) scale(0.82);
+            opacity: 0;
             color: transparent;
         }
 
@@ -959,11 +1327,12 @@
 
         @media (min-width: 641px) {
             .notch-nav {
-                width: min(100%, 22rem);
-                --bubble-size: 3.35rem;
-                --item-size: 2.8rem;
-                --notch-radius: 1.72rem;
-                --lift: 0.9rem;
+                width: min(100%, 23rem);
+                --bubble-size: 3.48rem;
+                --item-size: 2.82rem;
+                --dock-padding: 0.52rem;
+                --notch-radius: calc(var(--bubble-size) * 0.54);
+                --lift: 1rem;
             }
         }
 
@@ -985,8 +1354,8 @@
             }
 
             .notch-nav-track {
-                padding-inline: 0.3rem;
-                padding-top: 0.82rem;
+                padding-inline: 0.34rem;
+                padding-top: 0.9rem;
             }
 
             .repo-screen {
@@ -1025,6 +1394,16 @@
             .nav-time-pill::before {
                 animation-duration: 8s;
             }
+
+            .site-ambient-wash::before,
+            .site-ambient-wash::after,
+            .site-ambient-ribbons::before,
+            .site-ambient-ribbons::after,
+            .site-grid-glow,
+            .site-light-beam,
+            .ambient-orb {
+                animation: none;
+            }
         }
 
         @media (max-width: 389px) {
@@ -1042,10 +1421,11 @@
         @media (max-width: 380px) {
             .notch-nav {
                 width: min(100%, 18rem);
-                --bubble-size: 2.95rem;
+                --bubble-size: 3rem;
                 --item-size: 2.45rem;
-                --notch-radius: 1.5rem;
-                --lift: 0.74rem;
+                --dock-padding: 0.28rem;
+                --notch-radius: calc(var(--bubble-size) * 0.54);
+                --lift: 0.76rem;
             }
         }
     </style>
@@ -1054,11 +1434,14 @@
 <body id="top"
     class="overflow-x-hidden font-body text-slate-900 antialiased selection:bg-stone-300/40 selection:text-slate-950">
     <div class="pointer-events-none fixed inset-0 -z-30 bg-[#f6f2eb]"></div>
-    <div class="pointer-events-none fixed inset-0 -z-20 grid-glow opacity-70"></div>
+    <div class="site-ambient-wash pointer-events-none -z-20"></div>
+    <div class="site-ambient-ribbons pointer-events-none -z-20"></div>
+    <div class="pointer-events-none fixed inset-0 -z-20 grid-glow site-grid-glow opacity-70"></div>
+    <div class="site-light-beam pointer-events-none fixed inset-x-[-10%] top-20 -z-10 h-80 sm:h-[30rem]"></div>
     <div
-        class="pointer-events-none fixed inset-x-0 top-24 -z-10 mx-auto h-80 w-80 rounded-full bg-white/80 blur-3xl sm:h-[28rem] sm:w-[28rem]">
+        class="ambient-orb ambient-orb-primary pointer-events-none fixed inset-x-0 top-24 -z-10 mx-auto h-80 w-80 rounded-full bg-white/80 blur-3xl sm:h-[28rem] sm:w-[28rem]">
     </div>
-    <div class="pointer-events-none fixed right-0 top-1/3 -z-10 h-72 w-72 rounded-full bg-stone-300/35 blur-3xl"></div>
+    <div class="ambient-orb ambient-orb-secondary pointer-events-none fixed right-0 top-1/3 -z-10 h-72 w-72 rounded-full bg-stone-300/35 blur-3xl"></div>
 
     <!-- Navbar -->
     <nav id="topNavbar" class="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4 lg:px-8">
@@ -1067,7 +1450,7 @@
             <div class="nav-top-grid relative z-10 px-4 py-3 sm:px-6">
                 <a href="#top" class="nav-brand flex items-center gap-3 justify-self-start">
                     <div class="overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-soft">
-                        <video class="h-9 w-9 object-cover sm:h-10 sm:w-10" autoplay muted loop playsinline preload="auto">
+                        <video class="h-9 w-9 object-cover sm:h-10 sm:w-10" autoplay muted loop playsinline preload="metadata">
                             <source src="assets/video/Hlogo.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -1133,7 +1516,7 @@
         <!-- Hero -->
         <section class="relative isolate min-h-[100dvh] overflow-hidden">
             <video class="absolute inset-0 -z-20 h-full w-full object-cover" autoplay muted loop playsinline
-                preload="auto">
+                preload="metadata">
                 <source src="assets/video/m1.mp4" type="video/mp4">
             </video>
             <div class="hero-video-overlay absolute inset-0 -z-10"></div>
@@ -1168,8 +1551,8 @@
                 <div class="relative overflow-hidden rounded-[36px] border border-white/30 shadow-soft">
                     <video
                         class="absolute inset-0 h-full w-full scale-[1.03] object-cover object-center brightness-[1.05] contrast-[1.02]"
-                        autoplay muted loop playsinline preload="metadata">
-                        <source src="assets/video/v2.mp4" type="video/mp4">
+                        autoplay muted loop playsinline preload="none" data-lazy-video="true">
+                        <source data-src="assets/video/v2.mp4" type="video/mp4">
                     </video>
                     <div
                         class="absolute inset-0 bg-[linear-gradient(92deg,rgba(255,255,255,0.78)_0%,rgba(255,255,255,0.34)_26%,rgba(255,255,255,0.08)_46%,rgba(255,255,255,0)_68%)]">
@@ -1181,17 +1564,23 @@
                     <div class="relative flex min-h-[540px] items-center p-5 sm:min-h-[640px] sm:p-8 lg:p-12">
                         <div
                             class="w-full max-w-xl rounded-[32px] border border-black/0 bg-transparent p-6 shadow-none backdrop-blur-0 sm:p-10">
-                            <p class="font-apple text-sm font-semibold uppercase tracking-[0.28em] text-slate-500">About
+                            <p class="about-eyebrow font-techno text-sm font-semibold uppercase tracking-[0.28em] text-slate-500">About
                             </p>
                             <h2
-                                class="mt-4 font-apple text-4xl font-semibold tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-6xl">
+                                class="about-title mt-4 font-display text-4xl font-semibold text-slate-950 sm:text-5xl lg:text-6xl">
                                 About Me</h2>
                             <p
-                                class="mt-5 max-w-2xl font-apple text-[1.05rem] leading-[1.85] tracking-[-0.025em] text-slate-700 sm:text-[1.12rem]">
-                                I'm a Frontend Engineer who enjoys building modern, responsive, and
-                                performance-optimized web applications. I focus on clean UI development, reusable
-                                components, and creating smooth user experiences using JavaScript, React, and Tailwind
-                                CSS. I am continuously learning and improving my skills to build better digital Stuff..!
+                                class="about-copy mt-5 max-w-2xl font-body text-[1.05rem] text-slate-700 sm:text-[1.12rem]">
+                                I'm Jai Surya Kumar, a Full Stack Developer Trainee from Bihar, India, focused on
+                                building modern, responsive, and performance-driven web applications. I started coding
+                                in 2022 with JavaScript and have been growing through projects, consistent practice,
+                                and hands-on learning since completing my B.Tech in Computer Science in 2024. I work
+                                with HTML, CSS, JavaScript, React, Tailwind CSS, Node.js, and Git/GitHub, with a
+                                strong interest in <span class="about-emphasis">clean UI engineering, reusable
+                                    components, and real problem solving</span>. I study 5 to 6 hours daily, practice
+                                DSA regularly, and bring focus, ownership, and a collaborative mindset to every build.
+                                <span class="about-highlight font-techno">Early in my journey, consistent in my
+                                    growth</span>
                             </p>
 
                             <ul class="mt-8 grid gap-4 sm:grid-cols-2">
@@ -1201,7 +1590,7 @@
                                         class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/5 text-slate-700">
                                         <i data-feather="code" class="h-4 w-4"></i>
                                     </span>
-                                    <span class="font-apple text-[1.02rem] font-medium tracking-[-0.02em]">Frontend
+                                    <span class="about-card-label font-techno text-[1.02rem] font-medium tracking-[-0.02em]">Frontend
                                         Architecture</span>
                                 </li>
                                 <li
@@ -1210,7 +1599,7 @@
                                         class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/5 text-slate-700">
                                         <i data-feather="pen-tool" class="h-4 w-4"></i>
                                     </span>
-                                    <span class="font-apple text-[1.02rem] font-medium tracking-[-0.02em]">UI
+                                    <span class="about-card-label font-techno text-[1.02rem] font-medium tracking-[-0.02em]">UI
                                         Design</span>
                                 </li>
                                 <li
@@ -1219,7 +1608,7 @@
                                         class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/5 text-slate-700">
                                         <i data-feather="layout" class="h-4 w-4"></i>
                                     </span>
-                                    <span class="font-apple text-[1.02rem] font-medium tracking-[-0.02em]">JavaScript
+                                    <span class="about-card-label font-techno text-[1.02rem] font-medium tracking-[-0.02em]">JavaScript
                                         Applications</span>
                                 </li>
                                 <li
@@ -1228,7 +1617,7 @@
                                         class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/5 text-slate-700">
                                         <i data-feather="layers" class="h-4 w-4"></i>
                                     </span>
-                                    <span class="font-apple text-[1.02rem] font-medium tracking-[-0.02em]">React
+                                    <span class="about-card-label font-techno text-[1.02rem] font-medium tracking-[-0.02em]">React
                                         Ecosystem Engineering</span>
                                 </li>
                             </ul>
@@ -1255,8 +1644,8 @@
                         class="group rounded-[30px] border border-black/10 bg-white/55 p-4 shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-2 hover:border-black/15 hover:bg-white/72">
                         <div class="overflow-hidden rounded-[24px] border border-black/10">
                             <video class="h-56 w-full object-cover transition duration-500 group-hover:scale-[1.04]"
-                                autoplay muted loop playsinline preload="metadata">
-                                <source src="assets/video/v1.mp4" type="video/mp4">
+                                autoplay muted loop playsinline preload="none" data-lazy-video="true">
+                                <source data-src="assets/video/v1.mp4" type="video/mp4">
                             </video>
                         </div>
                         <div class="px-2 pb-2 pt-5">
@@ -1277,8 +1666,8 @@
                         class="group rounded-[30px] border border-black/10 bg-white/55 p-4 shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-2 hover:border-black/15 hover:bg-white/72">
                         <div class="overflow-hidden rounded-[24px] border border-black/10">
                             <video class="h-56 w-full object-cover transition duration-500 group-hover:scale-[1.04]"
-                                autoplay muted loop playsinline preload="metadata">
-                                <source src="assets/video/abt.mp4" type="video/mp4">
+                                autoplay muted loop playsinline preload="none" data-lazy-video="true">
+                                <source data-src="assets/video/abt.mp4" type="video/mp4">
                             </video>
                         </div>
                         <div class="px-2 pb-2 pt-5">
@@ -1299,8 +1688,8 @@
                         class="group rounded-[30px] border border-black/10 bg-white/55 p-4 shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-2 hover:border-black/15 hover:bg-white/72 md:col-span-2 xl:col-span-1">
                         <div class="overflow-hidden rounded-[24px] border border-black/10">
                             <video class="h-56 w-full object-cover transition duration-500 group-hover:scale-[1.04]"
-                                autoplay muted loop playsinline preload="metadata">
-                                <source src="assets/video/m1.mp4" type="video/mp4">
+                                autoplay muted loop playsinline preload="none" data-lazy-video="true">
+                                <source data-src="assets/video/m1.mp4" type="video/mp4">
                             </video>
                         </div>
                         <div class="px-2 pb-2 pt-5">
@@ -1355,12 +1744,13 @@
                         <aside class="repo-profile-panel flex flex-col gap-4">
                             <div class="repo-profile-card">
                                 <div class="repo-profile-backdrop" aria-hidden="true">
-                                    <video autoplay muted loop playsinline preload="metadata">
-                                        <source src="assets/video/git.vid.mp4" type="video/mp4">
+                                    <video autoplay muted loop playsinline preload="none" data-lazy-video="true">
+                                        <source data-src="assets/video/git.vid.mp4" type="video/mp4">
                                     </video>
                                 </div>
 
                                 <img id="repoProfileAvatar" src="https://avatars.githubusercontent.com/u/0?v=4" alt="GitHub profile avatar"
+                                    loading="lazy" decoding="async" fetchpriority="low" width="80" height="80"
                                     class="repo-profile-avatar">
                                 <div class="mt-5">
                                     <p id="repoProfileName" class="font-display text-2xl font-semibold text-slate-950">GitHub Profile</p>

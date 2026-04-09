@@ -90,6 +90,86 @@ window.addEventListener("DOMContentLoaded", () => {
         items: [],
     };
     const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const runWhenIdle = (callback, timeout = 1200) => {
+        if ("requestIdleCallback" in window) {
+            window.requestIdleCallback(callback, { timeout });
+            return;
+        }
+
+        window.setTimeout(callback, Math.min(180, timeout));
+    };
+    const debounce = (callback, wait = 120) => {
+        let timeoutId = null;
+
+        return (...args) => {
+            if (timeoutId !== null) {
+                window.clearTimeout(timeoutId);
+            }
+
+            timeoutId = window.setTimeout(() => {
+                timeoutId = null;
+                callback(...args);
+            }, wait);
+        };
+    };
+    const supportsLocalStorage = (() => {
+        try {
+            const probeKey = "__iojoy_perf_probe__";
+            window.localStorage.setItem(probeKey, "1");
+            window.localStorage.removeItem(probeKey);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    })();
+    const githubCachePrefix = "iojoy:github-cache:";
+    const githubCacheTtlMs = 1000 * 60 * 15;
+    const getCachedJson = (key, { allowExpired = false } = {}) => {
+        if (!supportsLocalStorage) {
+            return null;
+        }
+
+        try {
+            const raw = window.localStorage.getItem(key);
+
+            if (!raw) {
+                return null;
+            }
+
+            const parsed = JSON.parse(raw);
+
+            if (!parsed || typeof parsed !== "object" || !("value" in parsed)) {
+                window.localStorage.removeItem(key);
+                return null;
+            }
+
+            const expiresAt = Number(parsed.expiresAt || 0);
+
+            if (!allowExpired && expiresAt && Date.now() > expiresAt) {
+                window.localStorage.removeItem(key);
+                return null;
+            }
+
+            return parsed.value;
+        } catch (error) {
+            return null;
+        }
+    };
+    const setCachedJson = (key, value, ttlMs = githubCacheTtlMs) => {
+        if (!supportsLocalStorage) {
+            return;
+        }
+
+        try {
+            window.localStorage.setItem(key, JSON.stringify({
+                value,
+                expiresAt: Date.now() + Math.max(0, ttlMs),
+            }));
+        } catch (error) {
+            // Ignore quota/storage errors and keep runtime behavior intact.
+        }
+    };
+    const getGitHubCacheKey = (url) => `${githubCachePrefix}${url}`;
 
     const isConfiguredValue = (value) => {
         if (!value) {
@@ -205,19 +285,19 @@ window.addEventListener("DOMContentLoaded", () => {
         }
 
         const now = new Date();
-        const timeFormatter = new Intl.DateTimeFormat(undefined, {
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-        const dateFormatter = new Intl.DateTimeFormat(undefined, {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-        });
 
         navbarTime.textContent = timeFormatter.format(now);
         navbarDate.textContent = dateFormatter.format(now);
     };
+    const timeFormatter = new Intl.DateTimeFormat(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+    const dateFormatter = new Intl.DateTimeFormat(undefined, {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    });
 
     const makeBinaryLine = (groups) => {
         return Array.from({ length: groups }, () => {
@@ -233,6 +313,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
         const mediaQuery = window.matchMedia("(max-width: 640px)");
         let binaryRows = [];
+        let binaryIntervalId = null;
 
         const buildBinaryBackground = () => {
             navbarBinaryLayer.innerHTML = "";
@@ -251,19 +332,50 @@ window.addEventListener("DOMContentLoaded", () => {
             });
         };
 
-        buildBinaryBackground();
-
-        window.setInterval(() => {
+        const refreshBinaryRows = () => {
             binaryRows.forEach((row, index) => {
                 row.textContent = makeBinaryLine(mediaQuery.matches ? 16 + (index % 2) * 2 : 28 + (index % 2) * 3);
             });
-        }, 1100);
+        };
+
+        const stopBinaryTicker = () => {
+            if (binaryIntervalId !== null) {
+                window.clearInterval(binaryIntervalId);
+                binaryIntervalId = null;
+            }
+        };
+
+        const startBinaryTicker = () => {
+            if (binaryIntervalId !== null || prefersReducedMotion() || document.hidden) {
+                return;
+            }
+
+            binaryIntervalId = window.setInterval(refreshBinaryRows, 1600);
+        };
+
+        buildBinaryBackground();
+        refreshBinaryRows();
+        startBinaryTicker();
 
         if (typeof mediaQuery.addEventListener === "function") {
-            mediaQuery.addEventListener("change", buildBinaryBackground);
+            mediaQuery.addEventListener("change", () => {
+                buildBinaryBackground();
+                refreshBinaryRows();
+            });
         } else if (typeof mediaQuery.addListener === "function") {
-            mediaQuery.addListener(buildBinaryBackground);
+            mediaQuery.addListener(() => {
+                buildBinaryBackground();
+                refreshBinaryRows();
+            });
         }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                stopBinaryTicker();
+            } else {
+                startBinaryTicker();
+            }
+        });
     };
 
     const initNotchNavigation = () => {
@@ -284,65 +396,99 @@ window.addEventListener("DOMContentLoaded", () => {
         let isTicking = false;
         const sectionRatios = new Map();
         let sectionObserver = null;
+        let lastIndicatorCenter = null;
+        let scrollLockUntil = 0;
+        let trackEdgePadding = 0;
 
-        const positionIndicator = (item) => {
+        const updateTrackMetrics = () => {
+            const trackStyles = window.getComputedStyle(notchNavTrack);
+            trackEdgePadding = parseFloat(trackStyles.paddingLeft || "0") || 0;
+        };
+
+        const positionIndicator = (item, { force = false } = {}) => {
             if (!item) {
                 return;
             }
 
             const indicatorCenter = item.offsetLeft + (item.offsetWidth / 2);
+            const trackWidth = notchNavTrack.clientWidth || notchNav.clientWidth || 0;
+            const bubbleWidth = notchIndicator.offsetWidth || item.offsetWidth || 0;
+            const minCenter = bubbleWidth ? ((bubbleWidth / 2) + trackEdgePadding) : indicatorCenter;
+            const maxCenter = trackWidth ? (trackWidth - (bubbleWidth / 2) - trackEdgePadding) : indicatorCenter;
+            const safeCenter = trackWidth
+                ? Math.min(Math.max(indicatorCenter, minCenter), maxCenter)
+                : indicatorCenter;
 
-            notchNav.style.setProperty("--active-left", `${indicatorCenter}px`);
-            notchNavTrack.style.setProperty("--active-left", `${indicatorCenter}px`);
+            if (!force && lastIndicatorCenter !== null && Math.abs(lastIndicatorCenter - safeCenter) < 0.5) {
+                if (notchIndicator.innerHTML !== item.innerHTML) {
+                    notchIndicator.innerHTML = item.innerHTML;
+                }
+                return;
+            }
+
+            lastIndicatorCenter = safeCenter;
+
+            notchNav.style.setProperty("--active-left", `${safeCenter}px`);
+            notchNavTrack.style.setProperty("--active-left", `${safeCenter}px`);
 
             if (notchIndicator.innerHTML !== item.innerHTML) {
                 notchIndicator.innerHTML = item.innerHTML;
             }
         };
 
-        const setActiveItem = (item) => {
+        const setActiveItem = (item, { force = false } = {}) => {
             if (!item) {
                 return;
             }
 
+            const didChange = item !== activeItem;
             activeItem = item;
 
-            notchNavItems.forEach((navItem) => {
-                const isActive = navItem === item;
-                navItem.classList.toggle("is-active", isActive);
+            if (didChange || force) {
+                notchNavItems.forEach((navItem) => {
+                    const isActive = navItem === item;
+                    navItem.classList.toggle("is-active", isActive);
 
-                if (isActive) {
-                    navItem.setAttribute("aria-current", "page");
-                } else {
-                    navItem.removeAttribute("aria-current");
-                }
-            });
+                    if (isActive) {
+                        navItem.setAttribute("aria-current", "page");
+                    } else {
+                        navItem.removeAttribute("aria-current");
+                    }
+                });
+            }
 
-            positionIndicator(item);
+            positionIndicator(item, { force: force || didChange });
         };
 
-        const getEntryScore = ({ target }) => {
+        const getEntryScore = ({ target }, scrollOffset, focusLine, viewportHeight) => {
             if (!target) {
                 return Number.NEGATIVE_INFINITY;
             }
 
             const rect = target.getBoundingClientRect();
             const ratio = sectionRatios.get(target) || 0;
-            const focusLine = getScrollOffset() + (window.innerHeight * 0.28);
             const anchorLine = rect.top + Math.min(rect.height * 0.35, 180);
             const distancePenalty = Math.abs(anchorLine - focusLine);
-            const isInViewport = rect.bottom > getScrollOffset() && rect.top < window.innerHeight * 0.92;
+            const isInViewport = rect.bottom > scrollOffset && rect.top < viewportHeight * 0.92;
 
             return (ratio * 1200) + (isInViewport ? 140 : 0) - distancePenalty;
         };
 
         const syncActiveItemToScroll = () => {
+            if (performance.now() < scrollLockUntil) {
+                return;
+            }
+
+            const viewportHeight = window.innerHeight;
+            const scrollOffset = getScrollOffset();
+            const focusLine = scrollOffset + (viewportHeight * 0.28);
+
             if (window.scrollY <= 18) {
                 setActiveItem(navEntries[0]?.item || activeItem);
                 return;
             }
 
-            if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
+            if (viewportHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
                 setActiveItem(navEntries[navEntries.length - 1]?.item || activeItem);
                 return;
             }
@@ -351,7 +497,7 @@ window.addEventListener("DOMContentLoaded", () => {
             let bestScore = Number.NEGATIVE_INFINITY;
 
             navEntries.forEach((entry) => {
-                const score = getEntryScore(entry);
+                const score = getEntryScore(entry, scrollOffset, focusLine, viewportHeight);
 
                 if (score > bestScore) {
                     bestScore = score;
@@ -361,8 +507,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
             if (nextItem !== activeItem) {
                 setActiveItem(nextItem);
-            } else {
-                positionIndicator(activeItem);
             }
         };
 
@@ -408,24 +552,43 @@ window.addEventListener("DOMContentLoaded", () => {
 
         notchNavItems.forEach((item) => {
             item.addEventListener("click", () => {
-                window.requestAnimationFrame(() => setActiveItem(item));
+                scrollLockUntil = performance.now() + (prefersReducedMotion() ? 0 : 720);
+                window.requestAnimationFrame(() => setActiveItem(item, { force: true }));
             });
         });
 
-        window.addEventListener("resize", () => {
-            positionIndicator(activeItem);
-            observeSections();
-            requestScrollSync();
-        });
+        let resizeAnimationFrameId = 0;
+        const handleResize = () => {
+            if (resizeAnimationFrameId) {
+                return;
+            }
+
+            resizeAnimationFrameId = window.requestAnimationFrame(() => {
+                resizeAnimationFrameId = 0;
+                updateTrackMetrics();
+                positionIndicator(activeItem, { force: true });
+                observeSections();
+                requestScrollSync();
+            });
+        };
+
+        window.addEventListener("resize", handleResize);
         window.addEventListener("scroll", requestScrollSync, { passive: true });
-        window.addEventListener("load", () => positionIndicator(activeItem));
+        window.addEventListener("load", () => {
+            updateTrackMetrics();
+            positionIndicator(activeItem, { force: true });
+        });
 
         if ("ResizeObserver" in window) {
-            const resizeObserver = new ResizeObserver(() => positionIndicator(activeItem));
+            const resizeObserver = new ResizeObserver(() => {
+                updateTrackMetrics();
+                positionIndicator(activeItem, { force: true });
+            });
             resizeObserver.observe(notchNavTrack);
             notchNavItems.forEach((item) => resizeObserver.observe(item));
         }
 
+        updateTrackMetrics();
         observeSections();
         const hashMatchedItem = notchNavItems.find((item) => item.getAttribute("href") === window.location.hash);
         setActiveItem(hashMatchedItem || activeItem);
@@ -467,6 +630,32 @@ window.addEventListener("DOMContentLoaded", () => {
         }
 
         const videoState = new Map();
+        const hydratedVideos = new WeakSet();
+
+        const hydrateVideoSource = (video) => {
+            if (hydratedVideos.has(video)) {
+                return;
+            }
+
+            const lazySource = video.querySelector("source[data-src]");
+
+            if (!lazySource) {
+                hydratedVideos.add(video);
+                return;
+            }
+
+            const sourceValue = lazySource.getAttribute("data-src");
+
+            if (!sourceValue) {
+                hydratedVideos.add(video);
+                return;
+            }
+
+            lazySource.src = sourceValue;
+            lazySource.removeAttribute("data-src");
+            video.load();
+            hydratedVideos.add(video);
+        };
 
         const syncVideoPlayback = (video) => {
             const state = videoState.get(video);
@@ -482,6 +671,7 @@ window.addEventListener("DOMContentLoaded", () => {
             video.classList.toggle("is-video-paused", !shouldPlay);
 
             if (shouldPlay) {
+                hydrateVideoSource(video);
                 const playPromise = video.play();
 
                 if (playPromise && typeof playPromise.catch === "function") {
@@ -496,6 +686,9 @@ window.addEventListener("DOMContentLoaded", () => {
             video.muted = true;
             video.playsInline = true;
             video.classList.add("smart-video", "is-video-paused");
+            if (video.dataset.lazyVideo === "true") {
+                video.preload = "none";
+            }
 
             videoState.set(video, {
                 shouldPlay: false,
@@ -511,10 +704,15 @@ window.addEventListener("DOMContentLoaded", () => {
                         return;
                     }
 
+                    if (entry.isIntersecting) {
+                        hydrateVideoSource(entry.target);
+                    }
+
                     state.shouldPlay = entry.isIntersecting && entry.intersectionRatio > 0.18;
                     syncVideoPlayback(entry.target);
                 });
             }, {
+                rootMargin: "220px 0px",
                 threshold: [0, 0.12, 0.18, 0.3, 0.5, 0.75],
             });
 
@@ -522,6 +720,7 @@ window.addEventListener("DOMContentLoaded", () => {
         } else {
             smartVideos.forEach((video) => {
                 const state = videoState.get(video);
+                hydrateVideoSource(video);
                 state.shouldPlay = true;
                 syncVideoPlayback(video);
             });
@@ -710,18 +909,37 @@ window.addEventListener("DOMContentLoaded", () => {
         return languageColors[language] || "#94a3b8";
     };
 
-    const fetchGitHubJson = async (url) => {
-        const response = await fetch(url, {
-            headers: {
-                Accept: "application/vnd.github+json",
-            },
-        });
+    const fetchGitHubJson = async (url, { cacheTtlMs = githubCacheTtlMs } = {}) => {
+        const cacheKey = getGitHubCacheKey(url);
+        const cached = getCachedJson(cacheKey);
 
-        if (!response.ok) {
-            throw new Error(`GitHub API returned ${response.status}`);
+        if (cached !== null) {
+            return cached;
         }
 
-        return response.json();
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    Accept: "application/vnd.github+json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`GitHub API returned ${response.status}`);
+            }
+
+            const data = await response.json();
+            setCachedJson(cacheKey, data, cacheTtlMs);
+            return data;
+        } catch (error) {
+            const staleCache = getCachedJson(cacheKey, { allowExpired: true });
+
+            if (staleCache !== null) {
+                return staleCache;
+            }
+
+            throw error;
+        }
     };
 
     const fetchAllGitHubRepos = async (username) => {
@@ -820,7 +1038,6 @@ window.addEventListener("DOMContentLoaded", () => {
                 </button>
             `).join("");
 
-            bindSearchResultActions();
             return;
         }
 
@@ -860,7 +1077,6 @@ window.addEventListener("DOMContentLoaded", () => {
             </button>
         `).join("");
 
-        bindSearchResultActions();
     };
 
     const closeSearch = () => {
@@ -880,7 +1096,9 @@ window.addEventListener("DOMContentLoaded", () => {
         searchOverlay.style.pointerEvents = "auto";
         searchOverlay.style.opacity = "1";
         renderSearchResults(searchState.items, siteSearchInput.value);
-        window.setTimeout(() => siteSearchInput.focus(), 30);
+        window.requestAnimationFrame(() => {
+            siteSearchInput.focus({ preventScroll: true });
+        });
     };
 
     const activateSearchItem = (href, type) => {
@@ -906,16 +1124,6 @@ window.addEventListener("DOMContentLoaded", () => {
         window.open(href, "_blank", "noopener,noreferrer");
     };
 
-    const bindSearchResultActions = () => {
-        document.querySelectorAll(".search-result-item").forEach((item) => {
-            item.addEventListener("click", () => {
-                const href = item.getAttribute("data-href") || "";
-                const type = item.getAttribute("data-type") || "internal";
-                activateSearchItem(href, type);
-            });
-        });
-    };
-
     const initSearch = () => {
         buildSearchIndex();
 
@@ -926,9 +1134,24 @@ window.addEventListener("DOMContentLoaded", () => {
         openSearchButton.addEventListener("click", openSearch);
         closeSearchButton?.addEventListener("click", closeSearch);
         searchBackdrop?.addEventListener("click", closeSearch);
+        searchResults.addEventListener("click", (event) => {
+            const actionItem = event.target.closest(".search-result-item");
+
+            if (!actionItem) {
+                return;
+            }
+
+            const href = actionItem.getAttribute("data-href") || "";
+            const type = actionItem.getAttribute("data-type") || "internal";
+            activateSearchItem(href, type);
+        });
+
+        const renderSearchResultsDebounced = debounce((query) => {
+            renderSearchResults(searchState.items, query);
+        }, 90);
 
         siteSearchInput.addEventListener("input", (event) => {
-            renderSearchResults(searchState.items, event.target.value);
+            renderSearchResultsDebounced(event.target.value);
         });
 
         siteSearchInput.addEventListener("keydown", (event) => {
@@ -1161,8 +1384,60 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    updateNavbarDateTime();
-    window.setInterval(updateNavbarDateTime, 1000);
+    const initDeferredGitHubRepos = () => {
+        let hasLoaded = false;
+        const reposSection = document.getElementById("repos");
+        const loadReposOnce = () => {
+            if (hasLoaded) {
+                return;
+            }
+
+            hasLoaded = true;
+            loadGitHubRepos();
+        };
+
+        if (!reposSection || !("IntersectionObserver" in window)) {
+            loadReposOnce();
+            return;
+        }
+
+        const repoObserver = new IntersectionObserver((entries) => {
+            if (entries.some((entry) => entry.isIntersecting)) {
+                repoObserver.disconnect();
+                loadReposOnce();
+            }
+        }, {
+            root: null,
+            rootMargin: "420px 0px",
+            threshold: 0,
+        });
+
+        repoObserver.observe(reposSection);
+
+        runWhenIdle(() => {
+            const nearViewportThreshold = reposSection.offsetTop - (window.innerHeight * 1.6);
+
+            if (window.scrollY >= nearViewportThreshold) {
+                repoObserver.disconnect();
+                loadReposOnce();
+            }
+        }, 3200);
+    };
+
+    let navbarTimeTickTimeoutId = null;
+    const scheduleNavbarDateTimeUpdate = () => {
+        updateNavbarDateTime();
+        const millisecondsToNextMinute = 60000 - (Date.now() % 60000);
+        navbarTimeTickTimeoutId = window.setTimeout(scheduleNavbarDateTimeUpdate, millisecondsToNextMinute + 24);
+    };
+
+    scheduleNavbarDateTimeUpdate();
+    window.addEventListener("pagehide", () => {
+        if (navbarTimeTickTimeoutId !== null) {
+            window.clearTimeout(navbarTimeTickTimeoutId);
+            navbarTimeTickTimeoutId = null;
+        }
+    });
 
     initBinaryNavbar();
     initSmoothInternalNavigation();
@@ -1170,5 +1445,5 @@ window.addEventListener("DOMContentLoaded", () => {
     initSmartVideos();
     populateContactInfo();
     initSearch();
-    loadGitHubRepos();
+    initDeferredGitHubRepos();
 });
