@@ -695,6 +695,15 @@ window.addEventListener("DOMContentLoaded", () => {
             });
         });
 
+        smartVideos.forEach((video) => {
+            if (video.dataset.priorityVideo === "true") {
+                hydrateVideoSource(video);
+                if (video.dataset.lazyVideo === "true") {
+                    video.preload = "metadata";
+                }
+            }
+        });
+
         if ("IntersectionObserver" in window) {
             const videoObserver = new IntersectionObserver((entries) => {
                 entries.forEach((entry) => {
