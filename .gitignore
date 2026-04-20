@@ -1,0 +1,27 @@
+node_modules/
+
+# Local env/secrets
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Tooling caches/build output
+.npm-cache/
+.cache/
+dist/
+build/
+coverage/
+.parcel-cache/
+.turbo/

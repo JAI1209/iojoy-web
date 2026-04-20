@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -12,13 +12,11 @@
 
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
     <link rel="dns-prefetch" href="//unpkg.com">
     <link rel="dns-prefetch" href="//api.github.com">
     <link rel="dns-prefetch" href="//avatars.githubusercontent.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="preconnect" href="https://api.github.com" crossorigin>
     <link rel="preconnect" href="https://avatars.githubusercontent.com" crossorigin>
@@ -32,7 +30,7 @@
             href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=Sora:wght@600;700;800&display=swap">
     </noscript>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/tailwind.css">
     <script src="https://unpkg.com/feather-icons" defer></script>
     <script src="script.js" defer></script>
 
@@ -303,7 +301,7 @@
 
         .smart-video {
             backface-visibility: hidden;
-            will-change: opacity, filter;
+            will-change: opacity, filter, transform;
             transition:
                 opacity 0.34s ease,
                 filter 0.48s ease;
@@ -316,6 +314,59 @@
 
         .smart-video.is-video-playing {
             opacity: 1;
+        }
+
+        .readmore-details summary {
+            list-style: none;
+        }
+
+        .readmore-details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .readmore-icon {
+            transition: transform 200ms ease;
+        }
+
+        .readmore-details[open] .readmore-icon {
+            transform: rotate(45deg);
+        }
+
+        .syncdev-media {
+            background:
+                radial-gradient(circle at 22% 28%, rgba(236, 253, 245, 0.9) 0%, rgba(236, 253, 245, 0) 58%),
+                radial-gradient(circle at 86% 32%, rgba(224, 231, 255, 0.58) 0%, rgba(224, 231, 255, 0) 60%),
+                linear-gradient(135deg, rgba(2, 6, 23, 0.92) 0%, rgba(15, 23, 42, 0.82) 55%, rgba(3, 7, 18, 0.9) 100%);
+        }
+
+        .coming-soon-card {
+            isolation: isolate;
+        }
+
+        .coming-soon-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.72) 20%, transparent 40%);
+            opacity: 0.22;
+            transform: translate3d(-120%, 0, 0);
+            will-change: transform;
+            animation: coming-soon-shimmer 4.8s cubic-bezier(0.37, 0, 0.2, 1) infinite;
+            pointer-events: none;
+        }
+
+        @keyframes coming-soon-shimmer {
+            0% {
+                transform: translate3d(-120%, 0, 0);
+            }
+
+            55% {
+                transform: translate3d(120%, 0, 0);
+            }
+
+            100% {
+                transform: translate3d(120%, 0, 0);
+            }
         }
 
         .hero-video-overlay {
@@ -1390,9 +1441,58 @@
             }
         }
 
+        html.is-scrolling [class*="backdrop-blur"] {
+            -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
+        }
+
+        html.reduce-effects [class*="backdrop-blur"] {
+            -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
+        }
+
+        html.reduce-effects .site-ambient-wash::before,
+        html.reduce-effects .site-ambient-wash::after,
+        html.reduce-effects .site-ambient-ribbons::before,
+        html.reduce-effects .site-ambient-ribbons::after,
+        html.reduce-effects .site-grid-glow,
+        html.reduce-effects .site-light-beam,
+        html.reduce-effects .ambient-orb,
+        html.reduce-effects .nav-time-pill::before,
+        html.reduce-effects .nav-binary-stream,
+        html.reduce-effects .coming-soon-card::before {
+            animation: none !important;
+        }
+
+        html.is-scrolling .site-ambient-wash::before,
+        html.is-scrolling .site-ambient-wash::after,
+        html.is-scrolling .site-ambient-ribbons::before,
+        html.is-scrolling .site-ambient-ribbons::after,
+        html.is-scrolling .site-grid-glow,
+        html.is-scrolling .site-light-beam,
+        html.is-scrolling .ambient-orb,
+        html.is-scrolling .nav-time-pill::before,
+        html.is-scrolling .nav-binary-stream,
+        html.is-scrolling .coming-soon-card::before {
+            animation-play-state: paused !important;
+        }
+
         @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            [class*="backdrop-blur"] {
+                -webkit-backdrop-filter: none;
+                backdrop-filter: none;
+            }
+
             .nav-time-pill::before {
-                animation-duration: 8s;
+                animation: none;
+            }
+
+            .nav-binary-stream {
+                animation: none;
             }
 
             .site-ambient-wash::before,
@@ -1401,7 +1501,8 @@
             .site-ambient-ribbons::after,
             .site-grid-glow,
             .site-light-beam,
-            .ambient-orb {
+            .ambient-orb,
+            .coming-soon-card::before {
                 animation: none;
             }
         }
@@ -1551,8 +1652,8 @@
                 <div class="relative overflow-hidden rounded-[36px] border border-white/30 shadow-soft">
                     <video
                         class="absolute inset-0 h-full w-full scale-[1.03] object-cover object-center brightness-[1.05] contrast-[1.02]"
-                        autoplay muted loop playsinline preload="metadata" data-lazy-video="true" data-priority-video="true">
-                        <source src="assets/video/v2.mp4" data-src="assets/video/v2.mp4" type="video/mp4">
+                        autoplay muted loop playsinline preload="none" data-lazy-video="true">
+                        <source data-src="assets/video/v2.mp4" type="video/mp4">
                     </video>
                     <div
                         class="absolute inset-0 bg-[linear-gradient(92deg,rgba(255,255,255,0.78)_0%,rgba(255,255,255,0.34)_26%,rgba(255,255,255,0.08)_46%,rgba(255,255,255,0)_68%)]">
@@ -1656,7 +1757,7 @@
                             </p>
                             <a href="#top"
                                 class="mt-5 inline-flex items-center gap-2 rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-2.5 text-sm font-semibold text-slate-900 transition duration-300 hover:bg-black/[0.06] hover:text-black">
-                                View
+                                View-(Available-soon)
                                 <i data-feather="arrow-up-right" class="h-4 w-4"></i>
                             </a>
                         </div>
@@ -1678,7 +1779,7 @@
                             </p>
                             <a href="#about"
                                 class="mt-5 inline-flex items-center gap-2 rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-2.5 text-sm font-semibold text-slate-900 transition duration-300 hover:bg-black/[0.06] hover:text-black">
-                                View
+                                View-(Available-soon)
                                 <i data-feather="arrow-up-right" class="h-4 w-4"></i>
                             </a>
                         </div>
@@ -1700,11 +1801,137 @@
                             </p>
                             <a href="#contact"
                                 class="mt-5 inline-flex items-center gap-2 rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-2.5 text-sm font-semibold text-slate-900 transition duration-300 hover:bg-black/[0.06] hover:text-black">
-                                View
+                                View-(Available-soon)
                                 <i data-feather="arrow-up-right" class="h-4 w-4"></i>
                             </a>
                         </div>
                     </article>
+
+                    <article
+                        class="group rounded-[30px] border border-black/10 bg-white/55 p-4 shadow-soft backdrop-blur-2xl transition duration-300 hover:-translate-y-2 hover:border-black/15 hover:bg-white/72 md:col-span-2 xl:col-span-3">
+                        <div class="syncdev-media relative overflow-hidden rounded-[24px] border border-black/10">
+                            <div class="pointer-events-none absolute inset-0 opacity-85" aria-hidden="true">
+                                <div class="absolute inset-0 p-4 sm:p-6">
+                                    <div class="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-3 py-2 text-white/80">
+                                        <span class="h-2.5 w-2.5 rounded-full bg-rose-400/80"></span>
+                                        <span class="h-2.5 w-2.5 rounded-full bg-amber-300/70"></span>
+                                        <span class="h-2.5 w-2.5 rounded-full bg-emerald-300/70"></span>
+                                        <span class="ml-2 text-xs font-semibold uppercase tracking-[0.18em]">SyncDev</span>
+                                    </div>
+
+                                    <div class="mt-6 space-y-2.5">
+                                        <div class="h-3 w-10/12 rounded-full bg-white/10"></div>
+                                        <div class="h-3 w-8/12 rounded-full bg-white/10"></div>
+                                        <div class="h-3 w-11/12 rounded-full bg-white/10"></div>
+                                        <div class="h-3 w-7/12 rounded-full bg-white/10"></div>
+                                        <div class="h-3 w-9/12 rounded-full bg-white/10"></div>
+                                    </div>
+                                </div>
+
+                                <div class="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80">
+                                    <i data-feather="users" class="h-4 w-4"></i>
+                                    Live
+                                </div>
+                            </div>
+
+                            <div class="h-56 w-full"></div>
+                        </div>
+                        <div class="px-2 pb-2 pt-5">
+                            <div class="flex flex-wrap items-start justify-between gap-4">
+                                <div>
+                                    <h3 class="font-display text-xl font-semibold text-slate-950">SyncDev</h3>
+                                    <p class="mt-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Real-time collaborative code editor</p>
+                                </div>
+                                <span class="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    <i data-feather="zap" class="h-4 w-4"></i>
+                                    Featured
+                                </span>
+                            </div>
+
+                            <p class="mt-3 text-sm leading-7 text-slate-600">
+                                Multi-user editing with Monaco + Socket.IO, room-based collaboration, secure auth, and GitHub import/commit workflows.
+                            </p>
+
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">React</span>
+                                <span class="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Node</span>
+                                <span class="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">MongoDB</span>
+                                <span class="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Monaco</span>
+                                <span class="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Socket.IO</span>
+                                <span class="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">OAuth</span>
+                            </div>
+
+                            <div class="mt-5 flex flex-wrap items-center gap-3">
+                                <a href="https://github.com/JAI1209/syncdev-client" target="_blank" rel="noreferrer"
+                                    class="inline-flex items-center gap-2 rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-2.5 text-sm font-semibold text-slate-900 transition duration-300 hover:bg-black/[0.06] hover:text-black">
+                                    GitHub
+                                    <i data-feather="arrow-up-right" class="h-4 w-4"></i>
+                                </a>
+
+                                <details class="readmore-details">
+                                    <summary
+                                        class="inline-flex items-center gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-2.5 text-sm font-semibold text-slate-900 transition duration-300 hover:bg-white/85 hover:text-black active:scale-95">
+                                        Read more
+                                        <i data-feather="plus" class="readmore-icon h-4 w-4"></i>
+                                    </summary>
+                                    <ul class="mt-4 grid gap-2 text-sm leading-7 text-slate-600 sm:grid-cols-2">
+                                        <li class="flex gap-3">
+                                            <span class="mt-2 h-1.5 w-1.5 rounded-full bg-slate-400/70"></span>
+                                            <span>Real-time multi-user editing with Monaco Editor and WebSockets (Socket.IO).</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <span class="mt-2 h-1.5 w-1.5 rounded-full bg-slate-400/70"></span>
+                                            <span>Room-based collaboration with live sync, participant tracking, and session management.</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <span class="mt-2 h-1.5 w-1.5 rounded-full bg-slate-400/70"></span>
+                                            <span>Secure authentication with JWT + Google OAuth + GitHub OAuth.</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <span class="mt-2 h-1.5 w-1.5 rounded-full bg-slate-400/70"></span>
+                                            <span>Modular REST APIs + WebSocket events tuned for real-time performance.</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <span class="mt-2 h-1.5 w-1.5 rounded-full bg-slate-400/70"></span>
+                                            <span>GitHub repository import and commit workflows via GitHub API integration.</span>
+                                        </li>
+                                        <li class="flex gap-3">
+                                            <span class="mt-2 h-1.5 w-1.5 rounded-full bg-slate-400/70"></span>
+                                            <span>Built in a 4-member Agile team with Git, code reviews, and iterative delivery.</span>
+                                        </li>
+                                    </ul>
+                                </details>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="mt-10">
+                    <div
+                        class="coming-soon-card relative overflow-hidden rounded-[32px] border border-black/10 bg-white/55 p-6 shadow-soft backdrop-blur-2xl sm:p-8">
+                        <div class="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                            <div class="max-w-2xl">
+                                <p class="text-sm font-semibold uppercase tracking-[0.24em] text-stone-500">Coming Soon</p>
+                                <h3 class="mt-4 font-display text-2xl font-semibold text-slate-950 sm:text-3xl">SyncDev Live — flagship project</h3>
+                                <p class="mt-4 text-base leading-8 text-slate-600">
+                                    A product-grade launch is in progress: Monaco + Socket.IO real-time collaboration, secure OAuth/JWT auth, and GitHub-powered workflows — polished for a premium, developer-first experience.
+                                </p>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-3">
+                                <a href="https://github.com/JAI1209/syncdev-client" target="_blank" rel="noreferrer"
+                                    class="inline-flex items-center gap-2 rounded-2xl border border-black/10 bg-black/[0.03] px-4 py-2.5 text-sm font-semibold text-slate-900 transition duration-300 hover:bg-black/[0.06] hover:text-black">
+                                    View on GitHub
+                                    <i data-feather="arrow-up-right" class="h-4 w-4"></i>
+                                </a>
+                                <a href="#contact"
+                                    class="inline-flex items-center gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-2.5 text-sm font-semibold text-slate-900 transition duration-300 hover:bg-white/85 hover:text-black active:scale-95">
+                                    Get notified
+                                    <i data-feather="bell" class="h-4 w-4"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

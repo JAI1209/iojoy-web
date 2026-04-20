@@ -1,34 +1,3 @@
-tailwind.config = {
-    theme: {
-        extend: {
-            fontFamily: {
-                display: ["Sora", "sans-serif"],
-                body: ["Manrope", "sans-serif"],
-                techno: ["Space Grotesk", "sans-serif"],
-                apple: ["-apple-system", "BlinkMacSystemFont", "'SF Pro Display'", "'SF Pro Text'", "'Helvetica Neue'", "sans-serif"],
-            },
-            boxShadow: {
-                soft: "0 24px 70px rgba(15, 23, 42, 0.12)",
-                glass: "0 16px 45px rgba(17, 24, 39, 0.16)",
-            },
-            keyframes: {
-                float: {
-                    "0%, 100%": { transform: "translateY(0px)" },
-                    "50%": { transform: "translateY(-12px)" },
-                },
-                pulseGlow: {
-                    "0%, 100%": { opacity: "0.55" },
-                    "50%": { opacity: "0.95" },
-                },
-            },
-            animation: {
-                float: "float 7s ease-in-out infinite",
-                pulseGlow: "pulseGlow 6s ease-in-out infinite",
-            },
-        },
-    },
-};
-
 const portfolioConfig = {
     profile: {
         email: "rajsuriya51@gmail.com",
@@ -648,24 +617,32 @@ window.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const lazySource = video.querySelector("source[data-src]");
+            const lazySources = Array.from(video.querySelectorAll("source[data-src]"));
 
-            if (!lazySource) {
+            if (!lazySources.length) {
                 hydratedVideos.add(video);
                 return;
             }
 
-            const sourceValue = lazySource.getAttribute("data-src");
+            let didHydrate = false;
 
-            if (!sourceValue) {
-                hydratedVideos.add(video);
-                return;
-            }
+            lazySources.forEach((source) => {
+                const sourceValue = source.getAttribute("data-src");
 
-            lazySource.src = sourceValue;
-            lazySource.removeAttribute("data-src");
-            video.load();
+                if (!sourceValue) {
+                    return;
+                }
+
+                source.src = sourceValue;
+                source.removeAttribute("data-src");
+                didHydrate = true;
+            });
+
             hydratedVideos.add(video);
+
+            if (didHydrate) {
+                video.load();
+            }
         };
 
         const queueHydration = (video, { priority = false } = {}) => {
@@ -954,6 +931,14 @@ window.addEventListener("DOMContentLoaded", () => {
                 keywords: "video showcase cinematic portfolio motion",
                 href: "#work",
                 type: "internal",
+                category: "Project",
+            },
+            {
+                title: "SyncDev",
+                description: "Real-time collaborative code editor",
+                keywords: "syncdev collaborative editor monaco socket.io websockets saas oauth jwt github api",
+                href: "https://github.com/JAI1209/syncdev-client",
+                type: "external",
                 category: "Project",
             },
             {
@@ -1576,6 +1561,51 @@ window.addEventListener("DOMContentLoaded", () => {
         }, 3200);
     };
 
+    const initEffectBudget = () => {
+        const root = document.documentElement;
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const deviceMemory = typeof navigator.deviceMemory === "number" ? navigator.deviceMemory : null;
+        const hardwareConcurrency = typeof navigator.hardwareConcurrency === "number" ? navigator.hardwareConcurrency : null;
+
+        const shouldReduceEffects = prefersReducedMotion()
+            || Boolean(connection?.saveData)
+            || (deviceMemory !== null && deviceMemory <= 4)
+            || (hardwareConcurrency !== null && hardwareConcurrency <= 4);
+
+        root.classList.toggle("reduce-effects", shouldReduceEffects);
+    };
+
+    const initScrollPerfHints = () => {
+        const root = document.documentElement;
+        let scrollStopTimeoutId = null;
+
+        const handleScroll = () => {
+            if (!root.classList.contains("is-scrolling")) {
+                root.classList.add("is-scrolling");
+            }
+
+            if (scrollStopTimeoutId !== null) {
+                window.clearTimeout(scrollStopTimeoutId);
+            }
+
+            scrollStopTimeoutId = window.setTimeout(() => {
+                scrollStopTimeoutId = null;
+                root.classList.remove("is-scrolling");
+            }, 160);
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        window.addEventListener("wheel", handleScroll, { passive: true });
+        window.addEventListener("touchmove", handleScroll, { passive: true });
+        window.addEventListener("pagehide", () => {
+            if (scrollStopTimeoutId !== null) {
+                window.clearTimeout(scrollStopTimeoutId);
+                scrollStopTimeoutId = null;
+            }
+            root.classList.remove("is-scrolling");
+        });
+    };
+
     let navbarTimeTickTimeoutId = null;
     const scheduleNavbarDateTimeUpdate = () => {
         updateNavbarDateTime();
@@ -1594,6 +1624,13 @@ window.addEventListener("DOMContentLoaded", () => {
     initBinaryNavbar();
     initSmoothInternalNavigation();
     initNotchNavigation();
+    initEffectBudget();
+    if (typeof reducedMotionQuery.addEventListener === "function") {
+        reducedMotionQuery.addEventListener("change", initEffectBudget);
+    } else if (typeof reducedMotionQuery.addListener === "function") {
+        reducedMotionQuery.addListener(initEffectBudget);
+    }
+    initScrollPerfHints();
     initSmartVideos();
     populateContactInfo();
     initSearch();

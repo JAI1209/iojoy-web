@@ -1,128 +1,102 @@
-# Iojoy - Modern Portfolio
+# Iojoy — Modern Portfolio
 
-Iojoy is a responsive single-page portfolio for Jai Surya Kumar. It combines glassmorphism, local video storytelling, a custom notch-style mobile nav, and a live GitHub workspace that loads public repositories directly from GitHub.
+A premium, single-page portfolio built with Tailwind CSS + vanilla JavaScript. It features video storytelling, a custom notch-style navigation, a fast search overlay, and a live GitHub workspace that pulls repositories from the GitHub API.
 
-## Page Overview
+## Features
 
-The page is built as a polished front-end portfolio with these main sections:
-
-- Fixed top navbar with animated live time and date pill
-- Full-screen hero section with video background
-- About section with profile summary and skill highlights
-- Work section with video-based showcase cards
-- GitHub Workspace section with live profile data and repository grid
-- Contact section with GitHub, LinkedIn, Instagram, WhatsApp, and email links
-- Floating bottom notch navigation for quick section switching
-- Search overlay for section, project, and repository discovery
-
-## Main Features
-
-- Responsive layout tuned for desktop and small mobile devices
-- Custom notch navigation bar with active indicator
-- Animated timestamp pill in the navbar
-- Local video assets used across hero, about, work, logo, and GitHub profile areas
-- GitHub-style repository screen with live API data
-- Internal repo scroll area for long repository lists
-- Search panel that can find sections, projects, contact links, and repositories
+- Video-first hero + work cards with smart offscreen pause/resume
+- Custom notch navigation with active indicator + smooth internal routing
+- Search overlay for sections, projects, and GitHub repositories
+- Live GitHub profile + repository grid (cached + paginated)
+- Performance-focused effects (scroll jank reduction + reduced-effects mode)
 
 ## Tech Stack
 
 - HTML5
-- Tailwind CSS via CDN
-- Vanilla JavaScript
+- Tailwind CSS (build-time, purged + minified)
+- JavaScript (vanilla)
 - Feather Icons
-- Google Fonts: Manrope, Sora, and Space Grotesk
+- Google Fonts (Manrope, Sora, Space Grotesk)
 
 ## Project Structure
 
 ```text
-IoJoy/
-|- index.html
-|- script.js
-|- README.md
-`- assets/
-   `- video/
-      |- Hlogo.mp4
-      |- abt.mp4
-      |- git.vid.mp4
-      |- m1.mp4
-      |- v1.mp4
-      `- v2.mp4
+.
+├─ assets/
+│  ├─ tailwind.css          # generated (build output)
+│  └─ video/
+├─ src/
+│  └─ tailwind.css          # Tailwind input entry
+├─ index.html
+├─ script.js
+├─ tailwind.config.js
+├─ package.json
+└─ package-lock.json
 ```
 
-## How It Works
+## Getting Started
 
-### Live GitHub Workspace
+### Prerequisites
 
-The GitHub section fetches profile and repository data from the GitHub API using the username configured in `script.js`.
+- Node.js (for building Tailwind CSS)
 
-- Loads the GitHub profile avatar, name, username, bio, meta details, stars, repo count, and followers
-- Fetches all public repositories with pagination
-- Sorts repositories by latest activity
-- Renders repository cards with description, topics, language, stars, branch, and updated date
+### Install
 
-### Portfolio Config
+```bash
+npm install
+```
 
-The easiest place to update identity and social links is the `portfolioConfig` object in `script.js`.
+### Build CSS (Production)
 
-Current fields:
+```bash
+npm run build
+```
 
-- `email`
-- `githubUsername`
-- `githubUrl`
-- `linkedinUrl`
-- `instagramUrl`
-- `whatsappNumber`
-- `whatsappMessage`
-- `repoPageSize`
+### Run Locally
 
-## Run Locally
+- Open `index.html` directly, or use VS Code Live Server.
+- Ensure internet access for:
+  - Google Fonts
+  - Feather Icons
+  - GitHub API requests
 
-This project does not need a build step.
+### Tailwind Watch (Optional)
 
-1. Clone or download the repository.
-2. Open `index.html` in a browser, or run it with a simple local server such as VS Code Live Server.
-3. Make sure you have internet access in the browser for:
-   - Tailwind CDN
-   - Google Fonts
-   - Feather Icons
-   - GitHub API requests
+```bash
+npm run dev:css
+```
 
-## Customize The Page
+## Customization
 
-### Update Personal Info
+- Update your profile/social links in `script.js` → `portfolioConfig.profile`
+- Replace videos in `assets/video/` and update `<source>` paths in `index.html`
 
-Edit `script.js` and change the values inside `portfolioConfig.profile`.
+## Screenshots
 
-### Update Section Content
+Add screenshots in `assets/screenshots/` and reference them here:
 
-Edit `index.html` to change:
+- `assets/screenshots/home.png`
+- `assets/screenshots/work.png`
+- `assets/screenshots/github.png`
 
-- Hero heading and intro copy
-- About section text
-- Work section cards
-- Contact labels and layout
-- GitHub section heading or UI copy
+## Deployment
 
-### Replace Videos
+### Netlify (Recommended for static sites)
 
-Swap files inside `assets/video/` and update the matching `<source>` paths in `index.html` if needed.
+- Build command: `npm run build`
+- Publish directory: `.`
 
-Current video usage:
+### Vercel
 
-- `m1.mp4` for the hero background and one work card
-- `v2.mp4` for the about section
-- `abt.mp4` and `m1.mp4` for showcase cards
-- `Hlogo.mp4` for the navbar brand logo
-- `git.vid.mp4` for the GitHub profile card background
+- If you commit `assets/tailwind.css`, you can deploy as a static site with no build step.
+- If you want Vercel to build Tailwind on deploy:
+  - Build command: `npm run build`
+  - Output directory: `.`
 
-## Notes
+## Future Improvements
 
-- The page is designed as a static front-end portfolio.
-- Repository content in the GitHub section is loaded live in the browser.
-- If GitHub data does not appear, check the configured username in `script.js` and confirm browser network access.
-
-## Author
-
-Jai Surya Kumar  
-Frontend Engineer building modern UI systems and responsive digital experiences.
+- Add WebM sources (`<source type="video/webm">`) for smaller video payloads
+- Add `poster` images for instant video placeholders
+- Add JS bundling/minification (optional) for even faster first load
+- Add a blog section + RSS feed + sitemap
+- Add automated Lighthouse performance budgets (CI)
